@@ -20,6 +20,12 @@ namespace ReadHaven.Controllers
             return View(_context.Books.ToList());
         }
 
+        public IActionResult Details(Guid Id)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.Id == Id);  
+            return View(_context.Books.ToList());
+        }
+
         public IActionResult Privacy()
         {
             return View();

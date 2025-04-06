@@ -29,7 +29,7 @@
                     <td>@book.Price.ToString("C")</td> <!-- Display price in currency format -->
                     <td>@book.Likes</td>
                     <td>
-                        <a href="@Url.Action("Details", "Books", new { id = book.Id })" class="btn btn-info btn-sm">View Details</a>
+                        <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn btn-info btn-sm">View Details</a>
                         <!-- You can also add other actions like 'Add to Cart' -->
                     </td>
                 </tr>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven;
+using ReadHaven.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
            options.SlidingExpiration = true;
        });
 
+builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
