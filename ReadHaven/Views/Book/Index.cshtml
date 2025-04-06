@@ -1,0 +1,39 @@
+﻿@model IEnumerable<ReadHaven.Models.Book.Book>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Book List</h1>
+    <p>Here are the available books</p>
+</div>
+
+<div class="container mt-4">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Price</th>
+                <th>Likes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Genre</td>
+                    <td>@book.Price.ToString("C")</td> <!-- Display price in currency format -->
+                    <td>@book.Likes</td>
+                    <td>
+                        <a href="@Url.Action("Details", "Books", new { id = book.Id })" class="btn btn-info btn-sm">View Details</a>
+                        <!-- You can also add other actions like 'Add to Cart' -->
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

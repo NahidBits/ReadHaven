@@ -6,18 +6,18 @@ using ReadHaven.Models;
 namespace ReadHaven.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class BookController : Controller
     {
         public readonly AppDbContext _context;
 
-        public HomeController(AppDbContext context)
+        public BookController(AppDbContext context)
         {
             _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(_context.Books.ToList());
         }
 
         public IActionResult Privacy()
