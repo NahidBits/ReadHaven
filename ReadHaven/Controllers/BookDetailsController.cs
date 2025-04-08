@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
@@ -8,7 +10,7 @@ using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
 {
-    // [Authorize]
+    [Authorize]
     // [Route("[controller]")]
     public class BookDetailsController : Controller
     {

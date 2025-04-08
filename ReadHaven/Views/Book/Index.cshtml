@@ -9,6 +9,7 @@
     <p>Here are the available books</p>
 </div>
 
+@if (User.IsInRole("Admin")){
 <!-- Create New Book Form -->
 <div class="container mt-4">
     <h4>Create New Book</h4>
@@ -43,6 +44,7 @@
         <button type="submit" class="btn btn-primary">Add Book</button>
     </form>
 </div>
+}
 
 <!-- Book List -->
 <div class="container mt-4">
@@ -67,14 +69,13 @@
                     <td>
                         <!-- Details Button -->
                         <a href="@Url.Action("Details", "BookDetails", new { id = book.Id })" class="btn btn-info btn-sm">Details</a>
-
-                        <!-- Edit Button (Update) -->
-                        <a href="@Url.Action("Details", "BookDetails", new { id = book.Id })" class="btn btn-warning btn-sm">Edit</a>
-
+  
+                        @if (User.IsInRole("Admin")){
                         <!-- Delete Button -->
                         <form action="@Url.Action("Delete", "Book", new { id = book.Id })" method="post" class="d-inline">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
                         </form>
+                        }
                     </td>
                 </tr>
             }

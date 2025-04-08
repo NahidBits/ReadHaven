@@ -37,10 +37,16 @@ namespace ReadHaven.Controllers
 
                 if (result == PasswordVerificationResult.Success)
                 {
+                    var findUserRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == findUser.Id);
+
+                    if (findUserRole == null)
+                        return View();
+
+
                     var claims = new List<Claim>
                  {
                     new Claim(ClaimTypes.Email, findUser.Email),
-                    new Claim(ClaimTypes.Role, "User")
+                    new Claim(ClaimTypes.Role, findUserRole.Role)
                  };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -60,7 +66,7 @@ namespace ReadHaven.Controllers
             }
         }
 
-        //[HttpGet]
+        [HttpGet]
         public IActionResult SignUp()
         {
             return View();
@@ -78,13 +84,15 @@ namespace ReadHaven.Controllers
 
                 if (findUser != null)
                 {
-                    return Json(new { success = false, message = "Email is already used." });
+                    // Json(new { success = false, message = "Email is already used." });
+                    return View();
                 }
 
                 // Check if the password matches the confirm password
                 if (user.PasswordHash != confirmPassword)
                 {
-                    return Json(new { success = false, message = "Passwords do not match." });
+                    //return Json(new { success = false, message = "Passwords do not match." });
+                    return View();
                 }
 
                 // Hash the password before saving
@@ -92,8 +100,14 @@ namespace ReadHaven.Controllers
                 user.PasswordHash = passwordHasher.HashPassword(user, user.PasswordHash);
 
                 _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                UserRole userRole = new UserRole
+                {
+                    UserId = user.Id,
+                    Role = "User"
+                };
 
+                await _context.UserRoles.AddAsync(userRole);
+                await _context.SaveChangesAsync();
                 // Return success and redirect URL
                 return RedirectToAction("Index", "Auth", new { returnUrl = HttpContext.Request.Path });
             }

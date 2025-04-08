@@ -11,8 +11,8 @@ using ReadHaven.Services;
 using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
-{
-    // [Authorize]
+{  
+     [Authorize]
    // [Route("[controller]")]
     public class BookController : Controller
     {
@@ -34,22 +34,24 @@ namespace ReadHaven.Controllers
             return View(books);
         }
 
+       [Authorize(Roles = "Admin")]
         // POST: /Book/create
         [HttpPost("create")]
         public async Task<IActionResult> Create(Book book)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return NotFound();
 
                 await _bookRepository.AddAsync(book);
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: /Book/update
-        [HttpPost("update")]
+        [HttpPost]
         public async Task<IActionResult> Update(Book book)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return NotFound(); 
 
             await _bookRepository.UpdateAsync(book);
