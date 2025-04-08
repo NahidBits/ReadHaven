@@ -1,40 +1,82 @@
 using System.Diagnostics;
+using System.Net;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ReadHaven.Models;
+using Microsoft.EntityFrameworkCore;
+using ReadHaven.Models.Book;
+using ReadHaven.Models.User;
+using ReadHaven.Services;
+using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
 {
-    [Authorize]
+    // [Authorize]
+   // [Route("[controller]")]
     public class BookController : Controller
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
+        private readonly GenericRepository<Book> _bookRepository;
 
-        public BookController(AppDbContext context)
+        public BookController(AppDbContext context, GenericRepository<Book> bookRepository)
         {
             _context = context;
+            _bookRepository = bookRepository;
         }
 
-        public IActionResult Index()
+
+        // GET: /Book
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View(_context.Books.ToList());
+            var books = await _bookRepository.GetAllAsync();
+            return View(books);
         }
 
-        public IActionResult Details(Guid Id)
+        // POST: /Book/create
+        [HttpPost("create")]
+        public async Task<IActionResult> Create(Book book)
         {
-            var book = _context.Books.FirstOrDefault(b => b.Id == Id);  
-            return View(_context.Books.ToList());
+            if (ModelState.IsValid)
+                return NotFound();
+
+                await _bookRepository.AddAsync(book);
+            return RedirectToAction(nameof(Index));
         }
 
+        // POST: /Book/update
+        [HttpPost("update")]
+        public async Task<IActionResult> Update(Book book)
+        {
+            if (ModelState.IsValid)
+                return NotFound(); 
+
+            await _bookRepository.UpdateAsync(book);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: /Book/delete/{id}
+        [HttpPost("delete/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var book = await _bookRepository.GetByIdAsync(id);
+            if (book != null)
+            {
+                await _bookRepository.DeleteAsync(book);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        
         public IActionResult Privacy()
         {
             return View();
         }
-
+        /*
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        }*/
     }
 }

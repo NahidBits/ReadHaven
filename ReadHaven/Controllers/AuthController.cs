@@ -107,7 +107,7 @@ namespace ReadHaven.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Auth");
         }
-        
+
         public IActionResult ForgotPassword()
         {
             return View();

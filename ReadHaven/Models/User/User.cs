@@ -1,4 +1,5 @@
-﻿using ReadHaven.Models.Common;                                  
+﻿using Microsoft.AspNetCore.Identity;
+using ReadHaven.Models.Common;                                  
 
 namespace ReadHaven.Models.User
 {

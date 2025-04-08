@@ -1,0 +1,115 @@
+﻿@model ReadHaven.ViewModels.BookDetailsViewModel
+@using ReadHaven.Models.Enums
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-5">
+    <h2>Book Details</h2>
+
+    <form asp-action="Update" method="post">
+        <div class="form-group">
+            <label for="Title">Title</label>
+            <input type="text" class="form-control" id="Title" name="Title" value="@Model.Book.Title" required />
+        </div>
+        <div class="form-group">
+            <label for="Genre">Genre</label>
+            <input type="text" class="form-control" id="Genre" name="Genre" value="@Model.Book.Genre" required />
+        </div>
+        <div class="form-group">
+            <label for="Price">Price</label>
+            <input type="number" class="form-control" id="Price" name="Price" value="@Model.Book.Price" required />
+        </div>
+        <div class="form-group">
+            <label for="Likes">Likes</label>
+            <input type="number" class="form-control" id="Likes" name="Likes" value="@Model.Book.Likes" readonly />
+        </div>
+
+        <!-- Hidden input for Book Id -->
+        <input type="hidden" name="Id" value="@Model.Book.Id" />
+        <br />
+        <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
+    
+    <hr />
+    <h4>Reviews</h4>
+
+    @foreach (var review in Model.Reviews)
+    {
+        <div class="card my-2">
+            <div class="card-body">
+                <strong>Nahid</strong> - ⭐ @review.Rating
+                <p>@review.ReviewText</p>
+            </div>
+        </div>
+    }
+    <hr />
+    
+<h4>My Review</h4>
+
+<form asp-action="AddOrUpdateReview" method="post" class="row">
+    <input type="hidden" name="BookId" value="@Model.Book.Id" />
+    
+    @if (Model.UserReview != null)
+    {
+        <input type="hidden" name="Id" value="@Model.UserReview.Id" />
+        
+        <div class="form-group col-md-4">
+            <label for="Rating">Rating</label>
+            <select name="Rating" class="form-control" required>
+                    @foreach (var rating in Enum.GetValues(typeof(ReadHaven.Models.Enums.BookRating)).Cast<ReadHaven.Models.Enums.BookRating>())
+                    {
+                        var selected = Model.UserReview != null && Model.UserReview.Rating == rating ? "selected" : "";
+                        <option value="@((int)rating)" selected="@selected">@rating</option>
+                    }
+            </select>
+        </div>
+
+        <div class="form-group col-md-6">
+            <label for="ReviewText">Your Review</label>
+            <textarea name="ReviewText" class="form-control" required>@Model.UserReview.ReviewText</textarea>
+        </div>
+
+        <div class="form-group col-md-12 mt-2">
+            <button type="submit" class="btn btn-success">Update Review</button>
+        </div>
+    }
+    else
+    {
+        <div class="form-group col-md-4">
+            <label for="Rating">Rating</label>
+            <select name="Rating" class="form-control" required>
+                @foreach (var rating in Enum.GetValues(typeof(ReadHaven.Models.Enums.BookRating)))
+                {
+                    <option value="@((int)rating)">
+                        @rating
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group col-md-6">
+            <label for="ReviewText">Your Review</label>
+            <textarea name="ReviewText" class="form-control" required></textarea>
+        </div>
+
+        <div class="form-group col-md-12 mt-2">
+            <button type="submit" class="btn btn-primary">Create Review</button>
+        </div>
+    }
+</form>
+
+@if (Model.UserReview != null)
+{
+    <form asp-action="DeleteReview" method="post" class="mt-3">
+        <input type="hidden" name="reviewId" value="@Model.UserReview.Id" />
+        <input type="hidden" name="bookId" value="@Model.Book.Id" />
+        <button type="submit" class="btn btn-danger">Delete Review</button>
+    </form>
+}
+
+
+    <hr />
+    <a href="@Url.Action("Index", "Book")" class="btn btn-primary">Back to List</a>
+</div>
