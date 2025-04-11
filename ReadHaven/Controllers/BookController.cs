@@ -1,64 +1,63 @@
-using System.Diagnostics;
-using System.Net;
-using System.Security.Claims;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
-using ReadHaven.Models.User;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
-{  
-     [Authorize]
-   // [Route("[controller]")]
+{
     public class BookController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly BookService _bookService;
         private readonly GenericRepository<Book> _bookRepository;
 
-        public BookController(AppDbContext context, GenericRepository<Book> bookRepository)
+        public BookController(BookService bookService, GenericRepository<Book> bookRepository)
         {
-            _context = context;
+            _bookService = bookService;
             _bookRepository = bookRepository;
         }
 
-
-        // GET: /Book
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        // GET: Index
+        public IActionResult Index()
         {
-            var books = await _bookRepository.GetAllAsync();
-            return View(books);
+            return View();
         }
 
-       [Authorize(Roles = "Admin")]
-        // POST: /Book/create
-        [HttpPost("create")]
-        public async Task<IActionResult> Create(Book book)
+        // GET: GetBookList
+        [HttpGet("GetBookList")]
+        public async Task<IActionResult> GetBookList(BookSearchModel searchBook)
         {
-            if (!ModelState.IsValid)
+            var books = await _bookService.GetBooksWithSearchAsync(searchBook);
+            return Ok(books);
+        }
+
+        // POST: create
+        [Authorize(Roles = "Admin")]
+        [HttpPost("create")]
+        public async Task<IActionResult> Create(Book book, IFormFile image)
+        {
+            if (!ModelState.IsValid || image == null)
                 return NotFound();
 
-                await _bookRepository.AddAsync(book);
-            return RedirectToAction(nameof(Index));
+            await _bookService.AddBookWithImageAsync(book, image);
+
+            return Ok(new { success = true });
         }
 
+        // POST: update
         [Authorize(Roles = "Admin")]
-        // POST: /Book/update
-        [HttpPost]
+        [HttpPost("update")]
         public async Task<IActionResult> Update(Book book)
         {
             if (!ModelState.IsValid)
-                return NotFound(); 
+                return NotFound();
 
             await _bookRepository.UpdateAsync(book);
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Book/delete/{id}
         [HttpPost("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -69,16 +68,11 @@ namespace ReadHaven.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        
+
+        // Privacy Page (Can be removed or updated as necessary)
         public IActionResult Privacy()
         {
             return View();
         }
-        /*
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }*/
     }
 }
