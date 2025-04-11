@@ -46,3 +46,8 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.button.btn-link {
+    text-decoration: none !important;
+}
+

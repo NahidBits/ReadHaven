@@ -4,81 +4,87 @@
     ViewData["Title"] = "Book List";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Book List</h1>
-    <p>Here are the available books</p>
-</div>
-
-@if (User.IsInRole("Admin")){
-<!-- Create New Book Form -->
-<div class="container mt-4">
-    <h4>Create New Book</h4>
-    <form method="post" asp-action="Create" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="Title">Title</label>
-                    <input type="text" class="form-control" id="Title" name="Title" required />
+@if (User.IsInRole("Admin"))
+{
+    <!-- Create New Book Form -->
+    <div class="container mt-4">
+        <h4>Create New Book</h4>
+        <form method="post" enctype="multipart/form-data" class="book-form mb-4" id="create-book">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Title">Title</label>
+                        <input type="text" class="form-control" id="Title" name="Title" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Genre">Genre</label>
+                        <input type="text" class="form-control" id="Genre" name="Genre" required />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="Price">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="Price" name="Price" required />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="Image">Book Image</label>
+                        <input type="file" class="form-control" id="Image" name="Image" accept="image/*" required />
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Add Book</button>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="Genre">Genre</label>
-                    <input type="text" class="form-control" id="Genre" name="Genre" required />
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="Price">Price</label>
-                    <input type="number" step="0.01" class="form-control" id="Price" name="Price" required />
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="Likes">Likes</label>
-                    <input type="number" class="form-control" id="Likes" name="Likes" required />
-                </div>
-            </div>
-        </div>
-        <br />
-        <button type="submit" class="btn btn-primary">Add Book</button>
-    </form>
-</div>
+        </form>
+    </div>
 }
 
-<!-- Book List -->
+<!-- Book List Header -->
 <div class="container mt-4">
-    <table class="table table-striped">
+    <div class="text-left">
+        <h4>Book List</h4>
+        <p>Browse the available books</p>
+    </div>
+
+    <!-- Search Bar & Filters -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search for books..." />
+        </div>
+        <div class="col-md-3">
+            <input type="text" id="genreInput" class="form-control" placeholder="Enter genre..." />
+        </div>
+        <div class="col-md-3">
+                <select id="priceSortSelect" class="form-control">
+                    <option value="">Sort by Price</option>
+                    <option value="1">Low to High</option>
+                    <option value="2">High to Low</option>
+                </select>
+        </div>
+        <div class="col-md-3">
+            <button onclick="applyFilters()" class="btn btn-primary w-100">Apply Filters</button>
+        </div>
+    </div>
+
+    <!-- Book List Table -->
+    <table class="table table-striped" id="bookTable">
         <thead>
             <tr>
                 <th>Title</th>
                 <th>Genre</th>
-                <th>Price</th>
-                <th>Likes</th>
+                <th>Price (USD)</th>
+                <th>Image</th>
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var book in Model)
-            {
-                <tr>
-                    <td>@book.Title</td>
-                    <td>@book.Genre</td>
-                    <td>@book.Price.ToString("C")</td> <!-- Display price in currency format -->
-                    <td>@book.Likes</td>
-                    <td>
-                        <!-- Details Button -->
-                        <a href="@Url.Action("Details", "BookDetails", new { id = book.Id })" class="btn btn-info btn-sm">Details</a>
-  
-                        @if (User.IsInRole("Admin")){
-                        <!-- Delete Button -->
-                        <form action="@Url.Action("Delete", "Book", new { id = book.Id })" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
-                        </form>
-                        }
-                    </td>
-                </tr>
-            }
+        <tbody id="bookTableBody">
+            <!-- Table rows will be populated here via AJAX -->
         </tbody>
     </table>
 </div>
+
+<script src="~/js/Book/Index.js"></script>
