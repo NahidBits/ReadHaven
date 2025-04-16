@@ -116,6 +116,20 @@ namespace ReadHaven.Controllers
         }
         /*
 
+        [HttpGet("GetUserRoleStatus")]
+        public async Task<IActionResult> GetUserRoleStatus()
+        {
+            var role = await _userService.GetCurrentUserRole();
+
+            if (role != null)
+            {
+                return Ok(role);
+            }
+
+            return Ok("Guest");
+        }
+
+        [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
