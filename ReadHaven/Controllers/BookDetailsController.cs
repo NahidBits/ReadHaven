@@ -11,7 +11,7 @@ using ReadHaven.ViewModels;
 namespace ReadHaven.Controllers
 {
     [Authorize]
-    [Route("[controller]")]
+    // [Route("[controller]")]
     public class BookDetailsController : Controller
     {
         private readonly AppDbContext _context;
@@ -38,12 +38,12 @@ namespace ReadHaven.Controllers
             .Where(r => r.BookId == book.Id)
             .ToList();
 
-            var user = GetCurrentUser();
+            var currentUser = CurrentUser();
 
-            if (user != null)
+            if (currentUser != null)
             {
                 var userReview = await _context.BookReviews
-              .FirstOrDefaultAsync(u => u.UserId == user.Id && u.BookId == book.Id);
+              .FirstOrDefaultAsync(u => u.UserId == currentUser.Id && u.BookId == book.Id);
 
                 if (userReview != null)
                     bookView.UserReview = userReview;
@@ -58,7 +58,7 @@ namespace ReadHaven.Controllers
             if (review.ReviewText == null)
                 return NotFound();
 
-            var user = GetCurrentUser();
+            var user = CurrentUser();
 
             var existingReview = await _context.BookReviews
                 .FirstOrDefaultAsync(r => r.BookId == review.BookId && r.UserId == user.Id);
@@ -72,6 +72,7 @@ namespace ReadHaven.Controllers
             }
             else
             {
+                // Create new
                 review.UserId = user.Id;
                 await _reviewRepository.AddAsync(review);
             }
@@ -82,7 +83,7 @@ namespace ReadHaven.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteReview(Guid reviewId, Guid bookId)
         {
-            var user = GetCurrentUser();
+            var user = CurrentUser();
             var review = await _context.BookReviews
                 .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserId == user.Id && r.BookId == bookId);
 
@@ -91,7 +92,7 @@ namespace ReadHaven.Controllers
 
             return RedirectToAction("Details", new { id = bookId });
         }
-        public User GetCurrentUser()
+        public User CurrentUser()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);

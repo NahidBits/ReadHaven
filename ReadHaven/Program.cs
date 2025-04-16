@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven.Services;
 using ReadHaven;
-using ReadHaven.Services.Implementations;
-using ReadHaven.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 

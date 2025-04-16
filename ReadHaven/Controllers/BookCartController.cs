@@ -121,6 +121,7 @@ namespace ReadHaven.Controllers
             return Ok(count);
         }
 
+        [HttpPost("ChangeCartItemQuantity")]
         public IActionResult ChangeCartItemQuantity(Guid id, int quantity)
         {
             if (User.Identity.IsAuthenticated)
@@ -128,12 +129,12 @@ namespace ReadHaven.Controllers
                 var user = GetCurrentUser();
                 if (user != null)
                 {
-                    _cartService.ChangeCartItemQuantityForUser(user.Id, bookId, quantity);
+                    _cartService.ChangeCartItemQuantityForUser(id, quantity);
                 }
             }
             else
             {
-                _cartService.ChangeCartItemQuantityForGuest(bookId, quantity);
+                _cartService.ChangeCartItemQuantityForGuest(id, quantity);
             }
             return Ok(new { success = true, message = "Cart item quantity updated." });
         }

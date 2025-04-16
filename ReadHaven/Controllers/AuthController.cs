@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.User;
 using ReadHaven.Services;
-using ReadHaven.Services.Interfaces;
 
 namespace ReadHaven.Controllers
 {
