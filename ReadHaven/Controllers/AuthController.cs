@@ -2,30 +2,38 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ReadHaven.Models.User;        
+using ReadHaven.Models.User;
+using ReadHaven.Services;
+using ReadHaven.Services.Interfaces;
 
 namespace ReadHaven.Controllers
 {
-    //[Route("Auth")]
+    [Route("Auth")]
     public class AuthController : Controller
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
+        private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public AuthController(AppDbContext context)
+        public AuthController(AppDbContext context, IEmailSender emailSender, IConfiguration configuration, IUserService userService)
         {
             _context = context;
+            _emailSender = emailSender;
+            _configuration = configuration;
+            _userService = userService;
         }
-        
+
+        [HttpGet("Login")]
         public IActionResult Index()
         {
             return View();
         }
 
-         [HttpPost]
-        // [HttpPost("Login")]
-       // [HttpPost]
+        [HttpPost("Login")]
         public async Task<IActionResult> Index(User user)
         {
             var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
@@ -72,9 +80,6 @@ namespace ReadHaven.Controllers
             return View();
         }
 
-      //  [HttpPost("{Controller}/SignUp")]
-        //[ValidateAntiForgeryToken]
-       // [HttpPost]
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp(User user, string confirmPassword)
         {
@@ -84,14 +89,11 @@ namespace ReadHaven.Controllers
 
                 if (findUser != null)
                 {
-                    // Json(new { success = false, message = "Email is already used." });
                     return View();
                 }
 
-                // Check if the password matches the confirm password
                 if (user.PasswordHash != confirmPassword)
                 {
-                    //return Json(new { success = false, message = "Passwords do not match." });
                     return View();
                 }
 
@@ -108,13 +110,11 @@ namespace ReadHaven.Controllers
 
                 await _context.UserRoles.AddAsync(userRole);
                 await _context.SaveChangesAsync();
-                // Return success and redirect URL
                 return RedirectToAction("Index", "Auth", new { returnUrl = HttpContext.Request.Path });
             }
 
             return View();
         }
-        /*
 
         [HttpGet("GetUserRoleStatus")]
         public async Task<IActionResult> GetUserRoleStatus()
@@ -126,14 +126,14 @@ namespace ReadHaven.Controllers
                 return Ok(role);
             }
 
-            return Ok("Guest");
+            return NotFound("Role not found");
         }
 
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Auth");
+            return RedirectToAction("Login", "Auth");
         }
 
         public IActionResult ForgotPassword()
@@ -141,15 +141,96 @@ namespace ReadHaven.Controllers
             return View();
         }
 
-        [HttpPost("{Controller}/ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] User user)
+        // POST: /Auth/ForgotPassword
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            if (findUser != null)
-                return Json(new { success = true, message = $"Your passwword is : {findUser.PasswordHash}" });
-            else
-                return Json(new { success = false, message = "There is no user" });
-        }*/
+            if (user == null)
+            {
+                return View();
+            }
+
+            var token = Guid.NewGuid().ToString();
+
+            // Save the token in the database (you can create a ResetPasswordToken table if necessary)
+            var resetToken = new ResetPasswordToken
+            {
+                UserId = user.Id,
+                Token = token,
+                ExpirationDate = DateTime.UtcNow.AddHours(1) // Token expires in 1 hour
+            };
+            _context.ResetPasswordToken.Add(resetToken);
+            await _context.SaveChangesAsync();
+
+            // Send the reset link via email
+            var resetLink = Url.Action("ResetPassword", "Auth", new { token = token }, Request.Scheme);
+            var message = $"Click <a href='{resetLink}'>here</a> to reset your password.";
+
+            await _emailSender.SendEmailAsync(user.Email, "Password Reset Request", message);
+
+            return RedirectToAction("ForgotPasswordConfirmation");
+        }
+
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+
+        // GET: /Auth/ResetPassword
+        public IActionResult ResetPassword(string token)
+        {
+            var resetToken = _context.ResetPasswordToken.FirstOrDefault(t => t.Token == token && t.ExpirationDate > DateTime.UtcNow);
+
+            if (resetToken == null)
+            {
+                return RedirectToAction("TokenExpired");
+            }
+
+            var model = new PasswordResetModel { Token = token };
+            return View(model);
+        }
+
+        // POST: /Auth/ResetPassword
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(PasswordResetModel model)
+        {
+            if (model.NewPassword != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("", "Passwords do not match.");
+                return View(model);
+            }
+
+            // Check the token validity
+            var resetToken = _context.ResetPasswordToken.FirstOrDefault(t => t.Token == model.Token && t.ExpirationDate > DateTime.UtcNow);
+
+            if (resetToken == null)
+            {
+                return RedirectToAction("TokenExpired");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == resetToken.UserId);
+
+            if (user == null)
+            {
+                return RedirectToAction("TokenExpired");
+            }
+
+            var passwordHasher = new PasswordHasher<User>();
+            user.PasswordHash = passwordHasher.HashPassword(user, model.NewPassword);
+
+            _context.ResetPasswordToken.Remove(resetToken);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Auth");
+        }
+
+        public IActionResult TokenExpired()
+        {
+            return View();
+        }
     }
 }
