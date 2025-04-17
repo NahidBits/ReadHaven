@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.User;
 using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;

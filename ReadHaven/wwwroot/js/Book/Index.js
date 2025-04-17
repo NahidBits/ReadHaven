@@ -1,4 +1,4 @@
-﻿let userRole = ""; // Global User Role
+let userRole = ""; // Global User Role
 
 
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using ReadHaven.Models.Cart;
 using ReadHaven.Models.Book;
 using ReadHaven.Helpers;

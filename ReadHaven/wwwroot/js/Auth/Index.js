@@ -1,0 +1,41 @@
+﻿@model ReadHaven.Models.User.User
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <h2 class="text-center mb-4">Login</h2>
+
+        <form asp-action="Index" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" name="Email" class="form-control" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PasswordHash" class="form-label">Password</label>
+                <input asp-for="PasswordHash" name="PasswordHash" class="form-control" type="password" required />
+                <span asp-validation-for="PasswordHash" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+        </form>
+
+        <div class="container mt-4 text-center">
+            <h5 class="mb-3">Don't have an account?</h5>
+            <a href="/Auth/SignUp" class="btn btn-outline-primary w-100 mb-3">Sign Up</a>
+
+            <h5 class="mb-3">Forgot your password?</h5>
+            <a href="/Auth/ForgotPassword" class="btn btn-link text-decoration-none">Reset Password</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

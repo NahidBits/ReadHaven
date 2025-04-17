@@ -1,4 +1,4 @@
-﻿using ReadHaven.Models.Common;
+using ReadHaven.Models.Common;
 
 namespace ReadHaven.Models.Book
 {
