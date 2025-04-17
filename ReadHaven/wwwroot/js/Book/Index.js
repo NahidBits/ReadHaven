@@ -1,11 +1,8 @@
-let userRole = ""; // Global User Role
-
-
-
 // Form Submission for Creating a New Book
 function handleBookFormSubmit(event) {
     event.preventDefault();
 
+    const form = document.querySelector("#create-book");
     const formData = new FormData(document.querySelector("#create-book"));
 
     $.ajax({
@@ -18,7 +15,7 @@ function handleBookFormSubmit(event) {
             if (response.success) {
                 showToastMessage("Book added successfully!");
                 form.reset();
-                showBookList(); // Refresh the book list
+                showBookList();
             } else {
                 showToastMessage("Error adding book.", "error");
             }
@@ -77,7 +74,7 @@ function showBookList(searchData) {
                         <img src="${imagePath}" alt="${bookTitle}" style="max-width: 100px; height: auto;"/>
                     </td>
                     <td>
-                        <a href="/BookDetails/Details/${book.id}" class="btn btn-info btn-sm">Details</a>
+                        <a href="/Details/${book.id}" class="btn btn-info btn-sm">Details</a>
                         ${userRole === "Admin" ? `
                             <button type="button" class="btn btn-danger btn-sm" onclick="deleteBook('${book.id}')">Delete</button>
                         ` : ''}

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
@@ -46,16 +47,53 @@ namespace ReadHaven.Controllers
             return Ok(new { success = true });
         }
 
+        [HttpGet("details/{id}")]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var book = await _bookRepository.GetByIdAsync(id);
+            if (book == null) return NotFound();
+            /*
+            BookDetailsViewModel bookView = new BookDetailsViewModel();
+            bookView.Book = book;
+            bookView.Reviews = _context.BookReviews
+            .Where(r => r.BookId == book.Id)
+            .ToList();
+
+            var currentUser = CurrentUser();
+
+            if (currentUser != null)
+            {
+                var userReview = await _context.BookReviews
+              .FirstOrDefaultAsync(u => u.UserId == currentUser.Id && u.BookId == book.Id);
+
+                if (userReview != null)
+                    bookView.UserReview = userReview;
+            }
+            */
+            return View();
+        }
+
+        [HttpGet("GetBookById")]
+        public async Task<IActionResult> GetBook(Guid id)
+        {
+            var book = await _bookRepository.GetByIdAsync(id);
+            if (book == null) return NotFound();
+
+            return Ok(book);
+        }
+
         // POST: update
         [Authorize(Roles = "Admin")]
-        [HttpPost("update")]
-        public async Task<IActionResult> Update(Book book)
+        [HttpPost("BookUpdate")]
+        public async Task<IActionResult> Update([FromForm] Book book, [FromForm] IFormFile image)
         {
+            ModelState.Remove("image");
             if (!ModelState.IsValid)
                 return NotFound();
 
-            await _bookRepository.UpdateAsync(book);
-            return RedirectToAction(nameof(Index));
+            await _bookService.UpdateBookWithImageAsync(book, image);
+
+            return Ok(new { success = true });
         }
 
         [HttpPost("delete/{id}")]
@@ -67,12 +105,6 @@ namespace ReadHaven.Controllers
                 await _bookRepository.DeleteAsync(book);
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        // Privacy Page (Can be removed or updated as necessary)
-        public IActionResult Privacy()
-        {
-            return View();
         }
     }
 }
