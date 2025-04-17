@@ -138,6 +138,25 @@ namespace ReadHaven.Controllers
             }
             return Ok(new { success = true, message = "Cart item quantity updated." });
         }
+
+        [HttpPost("RemoveCartItem")]
+        public IActionResult RemoveCartItem(Guid id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = GetCurrentUser();
+                if (user != null)
+                {
+                    _cartService.RemoveCartItemForUser(id);
+                }
+            }
+            else
+            {
+                _cartService.RemoveCartItemForGuest(id);
+            }
+            return Ok(new { success = true, message = "Cart item quantity updated." });
+        }
+
         public User GetCurrentUser()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);

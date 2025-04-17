@@ -11,7 +11,7 @@ using ReadHaven.ViewModels;
 namespace ReadHaven.Controllers
 {
     [Authorize]
-    // [Route("[controller]")]
+    [Route("[controller]")]
     public class BookDetailsController : Controller
     {
         private readonly AppDbContext _context;

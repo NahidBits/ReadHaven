@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<h2>Your Cart</h2>
+
+<div id="cartEmptyMessage" class="alert alert-info" style="display:none;">
+    <p>Your cart is empty!</p>
+</div>
+
+<table id="cartTable" class="table" style="display:none;">
+    <thead>
+        <tr>
+            <th>Book Title</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="cartItemsTableBody">
+        <!-- Dynamic content will be injected here by JavaScript -->
+    </tbody>
+</table>
+
+<div id="totalContainer" class="d-flex justify-content-between">
+    <h3>Total: <span id="totalSum">0</span></h3>
+</div>
+
+<a href="@Url.Action("Checkout", "Cart")" class="btn btn-primary">Checkout</a>
+<script src="~/js/BookCart/Index.js"></script>

@@ -124,7 +124,7 @@ namespace ReadHaven.Controllers
                 return Ok(role);
             }
 
-            return NotFound("Role not found");
+            return Ok("Guest");
         }
 
         [HttpPost("Logout")]
@@ -134,6 +134,7 @@ namespace ReadHaven.Controllers
             return RedirectToAction("Login", "Auth");
         }
 
+        [HttpGet("ForgotPassword")]
         public IActionResult ForgotPassword()
         {
             return View();

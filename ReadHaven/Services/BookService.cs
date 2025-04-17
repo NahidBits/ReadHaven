@@ -35,11 +35,11 @@ namespace ReadHaven.Services
 
             if (searchModel.PriceSort.HasValue)
             {
-                if (searchModel.PriceSort == 1) 
+                if (searchModel.PriceSort == 1)
                 {
                     query = query.OrderBy(b => b.Price);
                 }
-                else if (searchModel.PriceSort == 2) 
+                else if (searchModel.PriceSort == 2)
                 {
                     query = query.OrderByDescending(b => b.Price);
                 }

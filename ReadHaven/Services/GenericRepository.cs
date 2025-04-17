@@ -47,5 +47,11 @@ namespace ReadHaven.Services
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
         }
+
+        //  Add this for querying
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }
