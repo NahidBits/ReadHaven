@@ -8,7 +8,7 @@ using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
 {
-    [Route("BookCart")]
+    [Route("[controller]")]
     public class BookCartController : Controller
     {
         private readonly CartService _cartService;
