@@ -51,7 +51,6 @@
 
         <!-- Review Display -->
         <div id="reviewDisplay" class="flex-grow-1 px-3">
-            <!-- JS will inject the review here -->
             <div class="text-center">Loading reviews...</div>
         </div>
 
@@ -62,7 +61,22 @@
     </div>
 </div>
 
-
-
+<hr />
+<div class="mt-4" id="review-section">
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <!-- Guest Message -->
+        <div class="text-center">
+            <p class="text-muted">Please <a href="/Account/Login">log in</a> to write a review.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Authenticated User Review Form (Will be filled by JS) -->
+        <div id="userReviewContainer">
+            <div class="text-center text-muted">Loading your review...</div>
+        </div>
+    }
+</div>
 
 <script src="~/js/Book/Details.js"></script>

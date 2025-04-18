@@ -52,24 +52,6 @@ namespace ReadHaven.Controllers
         {
             var book = await _bookRepository.GetByIdAsync(id);
             if (book == null) return NotFound();
-            /*
-            BookDetailsViewModel bookView = new BookDetailsViewModel();
-            bookView.Book = book;
-            bookView.Reviews = _context.BookReviews
-            .Where(r => r.BookId == book.Id)
-            .ToList();
-
-            var currentUser = CurrentUser();
-
-            if (currentUser != null)
-            {
-                var userReview = await _context.BookReviews
-              .FirstOrDefaultAsync(u => u.UserId == currentUser.Id && u.BookId == book.Id);
-
-                if (userReview != null)
-                    bookView.UserReview = userReview;
-            }
-            */
             return View();
         }
 
