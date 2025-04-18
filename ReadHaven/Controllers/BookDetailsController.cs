@@ -84,7 +84,7 @@ namespace ReadHaven.Controllers
         {
             var user = GetCurrentUser();
             var review = await _context.BookReviews
-                .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserId == user.Id  && r.BookId == bookId);
+                .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserId == user.Id && r.BookId == bookId);
 
             if (review == null) return NotFound();
             await _reviewRepository.DeleteAsync(review);

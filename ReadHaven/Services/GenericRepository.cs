@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -49,7 +49,7 @@ namespace ReadHaven.Services
         }
 
         //  Add this for querying
-        public IQueryable<T> GetQueryable() 
+        public IQueryable<T> GetQueryable()
         {
             return _dbSet.AsQueryable();
         }

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -15,14 +15,14 @@ namespace ReadHaven.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
-        private readonly IUserService _userService; 
+        private readonly IUserService _userService;
 
         public AuthController(AppDbContext context, IEmailSender emailSender, IConfiguration configuration, IUserService userService)
         {
             _context = context;
             _emailSender = emailSender;
             _configuration = configuration;
-            _userService = userService; 
+            _userService = userService;
         }
 
         [HttpGet("Login")]
@@ -124,7 +124,7 @@ namespace ReadHaven.Controllers
                 return Ok(role);
             }
 
-            return NotFound("Role not found");
+            return Ok("Guest");
         }
 
         [HttpPost("Logout")]
@@ -134,6 +134,7 @@ namespace ReadHaven.Controllers
             return RedirectToAction("Login", "Auth");
         }
 
+        [HttpGet("ForgotPassword")]
         public IActionResult ForgotPassword()
         {
             return View();
@@ -216,7 +217,7 @@ namespace ReadHaven.Controllers
                 return RedirectToAction("TokenExpired");
             }
 
-           var passwordHasher = new PasswordHasher<User>();
+            var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, model.NewPassword);
 
             _context.ResetPasswordToken.Remove(resetToken);
@@ -230,5 +231,5 @@ namespace ReadHaven.Controllers
         {
             return View();
         }
-    }   
+    }
 }

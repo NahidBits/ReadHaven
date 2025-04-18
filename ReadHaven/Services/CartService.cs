@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using ReadHaven.Models.Cart;
 using ReadHaven.Models.Book;
 using ReadHaven.Helpers;
@@ -16,10 +16,8 @@ namespace ReadHaven.Services
             _context = context;
         }
 
-        // Get the current HttpContext
         private HttpContext HttpContext => _httpContextAccessor.HttpContext;
 
-        // Get Cart for Guest (session-based)
         public List<CartItem> GetCartItemsForGuest()
         {
             var cartItems = HttpContext.Session.GetObjectFromJson<List<CartItem>>("Cart");
@@ -30,6 +28,20 @@ namespace ReadHaven.Services
         public List<CartItem> GetCartItemsForUser(Guid userId)
         {
             return _context.CartItems.Where(c => c.UserId == userId).ToList();
+        }
+
+        public int GetCartItemCountForGuest()
+        {
+            var cartItems = GetCartItemsForGuest();
+            return cartItems.Sum(item => item.Quantity);
+        }
+
+        // Returns the total number of cart items for a logged-in user (database-based)
+        public int GetCartItemCountForUser(Guid userId)
+        {
+            return _context.CartItems
+                           .Where(c => c.UserId == userId)
+                           .Sum(c => c.Quantity);
         }
 
         // Add Book to Cart for Guest
@@ -74,6 +86,69 @@ namespace ReadHaven.Services
             }
 
             _context.SaveChanges();
+        }
+
+        public void ChangeCartItemQuantityForUser(Guid id, int quantity)
+        {
+            var existingItem = _context.CartItems.FirstOrDefault(c => c.Id == id);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity += quantity;
+
+                if (existingItem.Quantity <= 0)
+                {
+                    _context.CartItems.Remove(existingItem);
+                }
+                else
+                {
+                    _context.CartItems.Update(existingItem);
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
+        public void ChangeCartItemQuantityForGuest(Guid id, int quantity)
+        {
+            var cartItems = GetCartItemsForGuest();
+            var existingItem = cartItems.FirstOrDefault(c => c.BookId == id);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity += quantity;
+
+                
+                if (existingItem.Quantity <= 0)
+                {
+                    cartItems.Remove(existingItem); 
+                }
+
+               
+                HttpContext.Session.SetObjectAsJson("Cart", cartItems);
+            }
+        }
+        public void RemoveCartItemForGuest(Guid id)
+        {
+            var cartItems = GetCartItemsForGuest();
+            var itemToRemove = cartItems.FirstOrDefault(c => c.BookId == id);
+
+            if (itemToRemove != null)
+            {
+                cartItems.Remove(itemToRemove);
+                HttpContext.Session.SetObjectAsJson("Cart", cartItems); 
+            }
+        }
+
+        public void RemoveCartItemForUser(Guid id)
+        {
+            var cartItem = _context.CartItems.FirstOrDefault(c => c.Id == id);
+
+            if (cartItem != null)
+            {
+                _context.CartItems.Remove(cartItem); 
+                _context.SaveChanges(); 
+            }
         }
     }
 }

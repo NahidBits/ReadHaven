@@ -6,9 +6,9 @@ namespace ReadHaven.ViewModels
 {
     public class BookDetailsViewModel 
     {
+        public Guid Id { get; set; }
         public Book Book { get; set; }
         public BookRating Rating { get; set; }  
-        
         public BookReview? UserReview { get; set; }
         public List<BookReview> Reviews { get; set; } = new List<BookReview>();
     }

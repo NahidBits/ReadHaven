@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.User;
 using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;
@@ -12,15 +12,15 @@ namespace ReadHaven
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
-        }      
-        
-        public DbSet<User> Users { get; set; }    
+        }
+
+        public DbSet<User> Users { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<BookReview> BookReviews { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<ResetPasswordToken> ResetPasswordToken { get; set; }
 
-        public DbSet<CartItem> CartItems { get; set; } 
+        public DbSet<CartItem> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,7 +76,7 @@ namespace ReadHaven
                 {
                     // Mark entity as deleted instead of actually deleting it
                     baseEntity.IsDeleted = true;
-                    entity.State = EntityState.Modified;  
+                    entity.State = EntityState.Modified;
                 }
             }
         }

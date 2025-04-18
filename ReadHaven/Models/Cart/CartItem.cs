@@ -1,4 +1,5 @@
-﻿using ReadHaven.Models.Common;
+using ReadHaven.Models.Common;
+using ReadHaven.Models.Book;
 
 namespace ReadHaven.Models.Cart
 {
@@ -6,7 +7,8 @@ namespace ReadHaven.Models.Cart
     {
         public Guid UserId { get; set; }
         public Guid BookId { get; set; }
-        public int Quantity { get; set; }  
-        public decimal Price { get; set; } 
+        public Guid OrderId { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
     }
 }

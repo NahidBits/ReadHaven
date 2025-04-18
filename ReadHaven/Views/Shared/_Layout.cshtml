@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -27,26 +27,24 @@
                         </li>
                     </ul>
 
-                    <!-- Profile, Cart, Logout links (aligned in a single line) -->
                     <ul class="navbar-nav d-flex align-items-center">
-                        <!-- Cart Link -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="BookCart" asp-action="Index">
-                                <i class="bi bi-cart"></i> Cart
+                        <li class="nav-item position-relative">
+                            <a class="nav-link text-dark" href="/BookCart/Index">
+                                <i class="bi bi-cart"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count-badge" style="font-size: 0.6rem; display: none;">
+                                    0
+                                </span>
+                                Cart
                             </a>
                         </li>
 
-                        <!-- Profile and Logout links only visible to authenticated users -->
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <!-- Profile Link -->
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
                                     <i class="bi bi-person"></i> Profile
                                 </a>
                             </li>
-
-                            <!-- Logout Button -->
                             <li class="nav-item">
                                 <form action="/Auth/Logout" method="post" class="p-0">
                                     <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">Logout</button>
@@ -55,7 +53,6 @@
                         }
                         else
                         {
-                            <!-- Login Link for unauthenticated users -->
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Index">
                                     <i class="bi bi-box-arrow-in-right"></i> Login
@@ -80,6 +77,17 @@
         </div>
     </footer>
 
+    <!-- ✅ Global Toast Notification -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+        <div id="globalToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div id="globalToastBody" class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

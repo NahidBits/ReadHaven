@@ -1,30 +1,10 @@
-﻿let userRole = ""; // Global User Role
+let userRole = ""; // Global User Role
 
-// Function to check admin status FIRST
-function checkRoleStatus() {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: "/Auth/GetUserRoleStatus", 
-            type: "GET",
-            success: function (data) {
-                if (data) {
-                    userRole = data;
-                    resolve();
-                } else {
-                    reject("Could not determine admin role.");
-                }
-            },
-            error: function (xhr, status, error) {
-                reject("Error while checking admin status: " + error);
-            }
-        });
-    });
-}
 
 
 // Form Submission for Creating a New Book
 function handleBookFormSubmit(event) {
-    event.preventDefault(); 
+    event.preventDefault();
 
     const formData = new FormData(document.querySelector("#create-book"));
 
@@ -36,31 +16,31 @@ function handleBookFormSubmit(event) {
         contentType: false,  // Important: Let browser set Content-Type
         success: function (response) {
             if (response.success) {
-                alert("Book added successfully!");
-                form.reset();        
-                showBookList();      // Refresh list
-            }
-
-             else {
-                alert("Error adding book.");
+                showToastMessage("Book added successfully!");
+                form.reset();
+                showBookList(); // Refresh the book list
+            } else {
+                showToastMessage("Error adding book.", "error");
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Error submitting the book form:", textStatus, errorThrown);
+            console.error("Error submitting book:", textStatus, errorThrown);
+            showToastMessage("Something went wrong!", "error");
         }
     });
 }
 
-// Search book by Title,Genre,price etc
+// Search book by Title, Genre, price, etc.
 function applyFilters() {
     const title = document.getElementById("searchInput").value.trim();
     const genre = document.getElementById("genreInput").value.trim();
     const priceSort = parseInt(document.getElementById("priceSortSelect").value) || null;
 
+    // Search parameters setup
     const searchData = {
-        Title: title,
-        Genre: genre,
-        PriceSort: priceSort
+        Title: title.length ? title : null,  // Only add to searchData if not empty
+        Genre: genre.length ? genre : null,
+        PriceSort: priceSort || null  // Null if invalid or missing
     };
 
     showBookList(searchData);
@@ -75,19 +55,19 @@ function showBookList(searchData) {
         data: searchData,
         success: function (data) {
             const tableBody = document.querySelector("#bookTableBody");
-            tableBody.innerHTML = "";  
+            tableBody.innerHTML = "";  // Clear existing entries
 
             data.forEach(book => {
                 const formattedPrice = new Intl.NumberFormat('en-US', {
                     style: 'currency',
-                    currency: 'USD'  
+                    currency: 'USD'
                 }).format(book.price);
 
                 const row = document.createElement("tr");
 
-                 const bookTitle = book.title ? book.title : 'N/A';
+                const bookTitle = book.title ? book.title : 'N/A';
                 const bookGenre = book.genre ? book.genre : 'N/A';
-                const imagePath = book.imagePath ? book.imagePath : '/uploads/book/Default_image.webp'; 
+                const imagePath = book.imagePath ? book.imagePath : '/uploads/book/Default_image.webp';
 
                 row.innerHTML = `
                     <td>${bookTitle}</td>
@@ -101,11 +81,10 @@ function showBookList(searchData) {
                         ${userRole === "Admin" ? `
                             <button type="button" class="btn btn-danger btn-sm" onclick="deleteBook('${book.id}')">Delete</button>
                         ` : ''}
-                            <button type="submit" class="btn btn-primary btn-sm" onclick="addToCart('${book.id}')">Add To Cart</button>
+                        <button type="submit" class="btn btn-primary btn-sm" onclick="addToCart('${book.id}')">Add To Cart</button>
                     </td>
                 `;
 
-                // Append the row to the table body
                 tableBody.appendChild(row);
             });
         },
@@ -115,28 +94,47 @@ function showBookList(searchData) {
     });
 }
 
+// Function to delete a book
 function deleteBook(bookId) {
-
     if (confirm('Are you sure you want to delete this book?')) {
-
         $.ajax({
-            url: '/Delete/' + bookId,  
-            type: 'POST',  
+            url: '/Delete/' + bookId,
+            type: 'POST',
             success: function (response) {
-                alert('Book deleted successfully!');
-                showBookList();  
+                showToastMessage("Book deleted successfully!");
+                showBookList();  // Refresh after deletion
             },
             error: function (xhr, status, error) {
-                alert('Error deleting book: ' + error);
+                showToastMessage("Error deleting book: " + error, "error");
             }
         });
     }
 }
 
+// Function to add a book to the cart
+function addToCart(bookId) {
+    $.ajax({
+        url: "/BookCart/AddToCart",
+        type: "POST",
+        data: { bookId: bookId },
+        success: function () {
+            showToastMessage("Book added to cart!");
+            updateCartCountBadge();
+        },
+        error: function (xhr, status, error) {
+            console.error("Failed to add to cart:", error);
+            alert("Something went wrong while adding to cart.");
+        }
+    });
+}
+
+// Handle the page load event and check for role status
 window.onload = function () {
+    updateCartCountBadge();
+
     checkRoleStatus()
         .then(() => {
-            showBookList();
+            showBookList();  // Show book list after role check
             if (userRole === "Admin") {
                 const bookForm = document.querySelector("#create-book");
                 if (bookForm) {
@@ -147,6 +145,4 @@ window.onload = function () {
         .catch((error) => {
             console.error(error);
         });
-
-    
 };
