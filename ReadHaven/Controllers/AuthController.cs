@@ -9,7 +9,7 @@ using ReadHaven.Services;
 
 namespace ReadHaven.Controllers
 {
-    [Route("Auth")]
+    [Route("[controller]")]
     public class AuthController : Controller
     {
         private readonly AppDbContext _context;
@@ -51,6 +51,7 @@ namespace ReadHaven.Controllers
 
                     var claims = new List<Claim>
                  {
+                   new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
                     new Claim(ClaimTypes.Email, findUser.Email),
                     new Claim(ClaimTypes.Role, findUserRole.Role)
                  };
