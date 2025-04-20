@@ -1,4 +1,4 @@
-﻿let bookId = null;
+let bookId = null;
 let reviews = [];
 let currentReviewIndex = 0;
 let currentUserReview = null;

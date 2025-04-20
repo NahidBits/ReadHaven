@@ -1,4 +1,4 @@
-﻿using ReadHaven.Models.Book;
+using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;
 using ReadHaven.Models.Enums;
 
