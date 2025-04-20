@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -34,21 +34,12 @@ namespace ReadHaven.Controllers
                                   .Where(r => r.BookId == id)
                                   .Select(r => new BookReviewViewModel
                                   {
-<<<<<<< HEAD
                                       Id = r.Id,
                                       ReviewText = r.ReviewText,
                                       Rating = r.Rating,
                                       Date = DateOnly.FromDateTime(r.CreatedAt),
                                       UserId = r.UserId,
                                       UserName = _context.Users
-=======
-                                  Id = r.Id,
-                                  ReviewText = r.ReviewText,
-                                  Rating = r.Rating,
-                                  Date = DateOnly.FromDateTime(r.CreatedAt), 
-                                  UserId = r.UserId,
-                                  UserName = _context.Users
->>>>>>> 688709e (Update CRUD on Book Review)
                                  .Where(u => u.Id == r.UserId)
                                  .Select(u => u.Username)
                                  .FirstOrDefault() ?? "Unknown"

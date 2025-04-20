@@ -3,6 +3,8 @@ using ReadHaven.Models.User;
 using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;
 using ReadHaven.Models.Cart;
+using ReadHaven.Models.Order;
+
 
 
 namespace ReadHaven
@@ -19,7 +21,7 @@ namespace ReadHaven
         public DbSet<BookReview> BookReviews { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<ResetPasswordToken> ResetPasswordToken { get; set; }
-
+        public DbSet<Order> Orders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,6 +35,7 @@ namespace ReadHaven
             modelBuilder.Entity<UserRole>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<ResetPasswordToken>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<CartItem>().HasQueryFilter(u => !u.IsDeleted);
+            modelBuilder.Entity<Order>().HasQueryFilter(u => !u.IsDeleted);
         }
 
         public override int SaveChanges()

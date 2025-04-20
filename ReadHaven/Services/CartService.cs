@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Http;
 using ReadHaven.Models.Cart;
 using ReadHaven.Models.Book;
 using ReadHaven.Helpers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using ReadHaven.Models.User;
 
 namespace ReadHaven.Services
 {
@@ -66,7 +68,6 @@ namespace ReadHaven.Services
             HttpContext.Session.SetObjectAsJson("Cart", cartItems);
         }
 
-        // Add Book to Cart for Logged-in User
         public void AddToCartForUser(Guid userId, Book book)
         {
             var cartItem = _context.CartItems.FirstOrDefault(c => c.UserId == userId && c.BookId == book.Id);
@@ -86,6 +87,30 @@ namespace ReadHaven.Services
             }
 
             _context.SaveChanges();
+        }
+
+        public void AddToCartForUser(CartItem cartItem)
+        {
+            if (cartItem == null || cartItem.UserId == Guid.Empty || cartItem.BookId == Guid.Empty || cartItem.Quantity <= 0 || cartItem.Price <= 0)
+            {
+                return;
+            }
+            else
+            {
+                var existingCartItem = _context.CartItems.FirstOrDefault(c => c.UserId == cartItem.UserId && c.BookId == cartItem.BookId);
+
+                if (existingCartItem != null)
+                {
+                    existingCartItem.Quantity += cartItem.Quantity;
+                    existingCartItem.Price += cartItem.Price;
+                    _context.CartItems.Update(existingCartItem);
+                }
+                else
+                {
+                    _context.CartItems.Add(cartItem);
+                }
+                _context.SaveChanges();
+            }
         }
 
         public void ChangeCartItemQuantityForUser(Guid id, int quantity)
@@ -118,13 +143,13 @@ namespace ReadHaven.Services
             {
                 existingItem.Quantity += quantity;
 
-                
+
                 if (existingItem.Quantity <= 0)
                 {
-                    cartItems.Remove(existingItem); 
+                    cartItems.Remove(existingItem);
                 }
 
-               
+
                 HttpContext.Session.SetObjectAsJson("Cart", cartItems);
             }
         }
@@ -136,8 +161,12 @@ namespace ReadHaven.Services
             if (itemToRemove != null)
             {
                 cartItems.Remove(itemToRemove);
-                HttpContext.Session.SetObjectAsJson("Cart", cartItems); 
+                HttpContext.Session.SetObjectAsJson("Cart", cartItems);
             }
+        }
+        public void ClearAllGuestCart()
+        {
+            _httpContextAccessor.HttpContext?.Session.Remove("Cart");
         }
 
         public void RemoveCartItemForUser(Guid id)
@@ -146,8 +175,8 @@ namespace ReadHaven.Services
 
             if (cartItem != null)
             {
-                _context.CartItems.Remove(cartItem); 
-                _context.SaveChanges(); 
+                _context.CartItems.Remove(cartItem);
+                _context.SaveChanges();
             }
         }
     }

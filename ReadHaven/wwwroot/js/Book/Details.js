@@ -1,4 +1,4 @@
-﻿let bookId = null;
+let bookId = null;
 let reviews = [];
 let currentReviewIndex = 0;
 let currentUserReview = null;
@@ -173,6 +173,7 @@ function deleteReview() {
 
 document.addEventListener("DOMContentLoaded", () => {
     bookId = window.location.pathname.split("/").pop();
+    checkRoleStatus();
     updateCartCountBadge();
 
     showBook(bookId);

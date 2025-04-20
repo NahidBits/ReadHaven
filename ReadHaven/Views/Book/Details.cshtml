@@ -93,8 +93,8 @@
 @section Scripts {
     <!-- Razor-injected user info for JS -->
     <script>
-        const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
-     //   const userRole = "@(User.IsInRole("Admin") ? "Admin" : (User.Identity.IsAuthenticated ? "User" : "Guest"))";
+           const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+        //   const userRole = "@(User.IsInRole("Admin") ? "Admin" : (User.Identity.IsAuthenticated ? "User" : "Guest"))";
     </script>
 
     <script src="~/js/Book/Details.js"></script>

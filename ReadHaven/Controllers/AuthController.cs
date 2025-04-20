@@ -16,23 +16,26 @@ namespace ReadHaven.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        private readonly CartService _cartService;
 
-        public AuthController(AppDbContext context, IEmailSender emailSender, IConfiguration configuration, IUserService userService)
+        public AuthController(AppDbContext context, IEmailSender emailSender, IConfiguration configuration, IUserService userService, CartService cartService)
         {
             _context = context;
             _emailSender = emailSender;
             _configuration = configuration;
             _userService = userService;
+            _cartService = cartService;
         }
 
         [HttpGet("Login")]
-        public IActionResult Index()
+        public IActionResult Index(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Index(User user)
+        public async Task<IActionResult> Index(User user, string returnUrl = null)
         {
             var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
@@ -51,6 +54,7 @@ namespace ReadHaven.Controllers
 
                     var claims = new List<Claim>
                  {
+                    new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
                    new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
                     new Claim(ClaimTypes.Email, findUser.Email),
                     new Claim(ClaimTypes.Role, findUserRole.Role)
@@ -60,47 +64,41 @@ namespace ReadHaven.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                                                    new ClaimsPrincipal(claimsIdentity));
 
+                    MergeGuestSessionToUser(findUser.Id);
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        return Redirect(returnUrl);
+
                     return RedirectToAction("Index", "Book");
                 }
-                else
-                {
-                    return View();
-                }
             }
-            else
-            {
-                return View();
-            }
+
+            // If login fails
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
         }
 
-        [HttpGet]
-        public IActionResult SignUp()
+        [HttpGet("SignUp")]
+        public IActionResult SignUp(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost("SignUp")]
-        public async Task<IActionResult> SignUp(User user, string confirmPassword)
+        public async Task<IActionResult> SignUp(User user, string confirmPassword, string returnUrl = null)
         {
             if (ModelState.IsValid)
             {
                 var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                if (findUser != null) return View();
 
-                if (findUser != null)
-                {
-                    return View();
-                }
+                if (user.PasswordHash != confirmPassword) return View();
 
-                if (user.PasswordHash != confirmPassword)
-                {
-                    return View();
-                }
-
-                // Hash the password before saving
                 var passwordHasher = new PasswordHasher<User>();
                 user.PasswordHash = passwordHasher.HashPassword(user, user.PasswordHash);
 
                 _context.Users.Add(user);
+
                 UserRole userRole = new UserRole
                 {
                     UserId = user.Id,
@@ -109,11 +107,30 @@ namespace ReadHaven.Controllers
 
                 await _context.UserRoles.AddAsync(userRole);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Auth", new { returnUrl = HttpContext.Request.Path });
+
+                // Sign in after registration
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, userRole.Role)
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                                               new ClaimsPrincipal(claimsIdentity));
+
+                MergeGuestSessionToUser(user.Id);
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
+
+                return RedirectToAction("Index", "Book");
             }
 
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
+
 
         [HttpGet("GetUserRoleStatus")]
         public async Task<IActionResult> GetUserRoleStatus()
@@ -231,6 +248,18 @@ namespace ReadHaven.Controllers
         public IActionResult TokenExpired()
         {
             return View();
+        }
+
+        public void MergeGuestSessionToUser(Guid userId)
+        {
+            var guestCart = _cartService.GetCartItemsForGuest();
+            foreach (var item in guestCart)
+            {
+                item.UserId = userId;
+                _cartService.AddToCartForUser(item);
+            }
+
+            _cartService.ClearAllGuestCart();
         }
     }
 }
