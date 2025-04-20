@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-4">
+
+    <!-- Profile Section -->
+    <div id="profileSection" class="mb-4">
+    </div>
+
+    <!-- Order Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered" id="orderTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody">
+                <!-- JS will render order rows here -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- JS data load and rendering -->
+<script src="~/js/profile.js"></script>
