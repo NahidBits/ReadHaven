@@ -9,6 +9,7 @@
         <h2 class="text-center mb-4">Login</h2>
 
         <form asp-action="Index" method="post">
+            <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
             <div class="form-group mb-3">
                 <label asp-for="Email" class="form-label">Email</label>
                 <input asp-for="Email" name="Email" class="form-control" required />
