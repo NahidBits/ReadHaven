@@ -1,0 +1,101 @@
+﻿﻿@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-5" id="book-details-container">
+    <h2 class="mb-4">Book Details</h2>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Admin Update Form -->
+        <div class="bg-light p-3 mb-4 rounded shadow-sm">
+            <form id="bookUpdateForm" enctype="multipart/form-data" method="post" class="d-flex align-items-center flex-wrap gap-2">
+                <input type="text" class="form-control w-auto" id="Title" name="Title" placeholder="Title" required />
+                <input type="text" class="form-control w-auto" id="Genre" name="Genre" placeholder="Genre" required />
+                <input type="number" class="form-control w-auto" id="Price" name="Price" step="0.01" placeholder="Price" required />
+                <input type="file" class="form-control w-auto" id="Image" name="Image" accept="image/*" />
+                <input type="hidden" name="Id" id="bookIdField" />
+                <button type="button" class="btn btn-success" onclick="saveBookUpdate()">Save</button>
+            </form>
+        </div>
+    }
+
+    <!-- Book Display -->
+    <div class="d-flex flex-wrap gap-4 align-items-start">
+        <div class="flex-shrink-0">
+            <img id="bookImage" src="/uploads/book/Default_image.webp" alt="Book Image" class="img-thumbnail" style="max-width: 250px;" />
+        </div>
+        <div class="flex-grow-1">
+            <p><strong>Title:</strong> <span id="ReadTitle"></span></p>
+            <p><strong>Genre:</strong> <span id="ReadGenre"></span></p>
+            <p><strong>Price:</strong> <span id="ReadPrice"></span></p>
+        </div>
+    </div>
+
+    <hr />
+    <a href="@Url.Action("Index", "Book")" class="btn btn-primary mt-4">Back to List</a>
+</div>
+
+
+<hr />
+<div class="mt-5" id="review-carousel-section">
+    <h4 class="mb-3">User Reviews</h4>
+
+    <div class="d-flex align-items-center justify-content-between">
+        <button class="btn btn-outline-secondary" onclick="previousReview()">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <div id="reviewDisplay" class="flex-grow-1 px-3 text-center">
+            <div class="text-center">Loading reviews...</div>
+        </div>
+
+        <button class="btn btn-outline-secondary" onclick="nextReview()">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+
+<!-- Review Carousel -->
+<hr />
+<div class="mt-5" id="reviewFormSection">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <form id="reviewForm" onsubmit="submitReview(event)">
+            <div class="mb-2">
+                <label class="form-label">Your Rating:</label>
+                <select name="Rating" id="ratingSelect" class="form-select" required>
+                    <option value="">Select</option>
+                    <option value="1">Bad</option>
+                    <option value="2">Satisfactory</option>
+                    <option value="3">Good</option>
+                    <option value="4">Very Good</option>
+                    <option value="5">Excellent</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Review:</label>
+                <textarea name="ReviewText" id="reviewTextArea" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success" id="reviewSubmitBtn" onclick="submitReview(event)">Submit Review</button>
+                <button type="button" class="btn btn-danger d-none" id="deleteReviewBtn" onclick="deleteReview()">Delete</button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <a href="/Auth/Login" class="btn btn-outline-primary">Login to write a review</a>
+    }
+</div>
+
+@section Scripts {
+    <!-- Razor-injected user info for JS -->
+    <script>
+           const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+        //   const userRole = "@(User.IsInRole("Admin") ? "Admin" : (User.Identity.IsAuthenticated ? "User" : "Guest"))";
+    </script>
+
+    <script src="~/js/Book/Details.js"></script>
+}

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using ReadHaven.Services;
 using ReadHaven.Models.Order;
-
+using ReadHaven.Services;
+using System.Security.Claims;
 
 namespace ReadHaven.Controllers
 {
@@ -13,41 +12,59 @@ namespace ReadHaven.Controllers
     {
         private readonly AppDbContext _context;
         private readonly CartService _cartService;
-        public BookOrderController(AppDbContext context, CartService cartService)   
+
+        public BookOrderController(AppDbContext context, CartService cartService)
         {
             _context = context;
             _cartService = cartService;
         }
 
         [HttpGet("Index")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             PlaceOrder(userId);
             return View();
         }
 
-        [HttpGet("GetUserOrder")]
-        public async Task<IActionResult> GetUserOrderAsync()
+        [HttpGet("GetUserOrders")]
+        public IActionResult GetUserOrders()
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            var orders = _context.Orders
+                .Where(o => o.UserId == userId && o.Status == "Pending")
+                .OrderByDescending(o => o.OrderDate)
+                .Select(o => new
+                {
+                    o.Id,
+                    TotalAmount = o.TotalAmount.ToString("0.00"),
+                    o.Status,
+                    OrderDate = o.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")
+                })
+                .ToList();
+
+            return Ok(orders);
+        }
+
+        [HttpPost("DeleteOrder")]
+        public IActionResult DeleteOrder(Guid orderId)
+        {
+            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
             var order = _context.Orders
-                .Where(o => o.UserId == userId)
-                .FirstOrDefault();
+                .FirstOrDefault(o => o.Id == orderId && o.UserId == userId);
 
             if (order == null)
-            {
-                return Json(new { TotalAmount = 0.00, Status = "No Order", OrderDate = DateTime.UtcNow });
-            }
+                return NotFound();
 
-            var orderData = new
-            {
-                TotalAmount = order.TotalAmount.ToString("0.00"),
-                Status = order.Status,
-                OrderDate = order.OrderDate
-            };
+            order.Status = "Done";               
+            order.UpdatedAt = DateTime.UtcNow;
 
-            return Ok(orderData);
+            _context.Orders.Update(order);
+            _context.SaveChanges();
+
+            return Ok();
         }
 
 
@@ -62,19 +79,20 @@ namespace ReadHaven.Controllers
             {
                 UserId = userId,
                 TotalAmount = cartItems.Sum(c => c.Price * c.Quantity),
-                OrderDate = DateTime.UtcNow
+                OrderDate = DateTime.UtcNow,
+                Status = "Pending"
             };
 
             _context.Orders.Add(order);
 
-            foreach(var item in cartItems)
+            foreach (var item in cartItems)
             {
                 item.OrderId = order.Id;
                 item.IsDeleted = true;
-            }   
+            }
+
             _context.CartItems.UpdateRange(cartItems);
             _context.SaveChanges();
         }
-
     }
 }

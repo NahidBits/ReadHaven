@@ -1,28 +1,20 @@
-﻿@{
-    ViewData["Title"] = "Order Summary";
-}
+﻿<div id="orderDetails">
+    <h4 class="mb-3">Your Orders</h4>
 
-<div class="container mt-4" id="orderSummary">
-    <h2 class="mb-3">Thank you! 🎉</h2>
-
-    <div class="alert alert-success">
-        Your order has been successfully placed. Below is the summary of your order.
-    </div>
-
-    <div id="orderDetails">
-        <h4 class="mb-3">Order Details</h4>
-
-        <!-- Displaying only the order-specific details -->
-        <div>
-            <p><strong>Total Amount:</strong><span id="totalAmount"></span></p>
-            <p><strong>Status:</strong> <span id="status"></span></p>
-            <p><strong>Order Date:</strong> <span id="orderDate"></span></p>
-        </div>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="/Book/Index" class="btn btn-primary">Continue Browsing Books</a>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="orderTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody">
+                <!-- Dynamic rows will be injected here -->
+            </tbody>
+        </table>
     </div>
 </div>
-
-<script src="~/js/Order/Index.js"> </script>
+<script src="~/js/Order/Index.js"></script>

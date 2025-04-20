@@ -1,4 +1,6 @@
-﻿// Function to check admin status FIRST
+﻿let userRole = ""; // Global User Role
+
+// Function to check admin status FIRST
 function checkRoleStatus() {
     return new Promise((resolve, reject) => {
         $.ajax({
