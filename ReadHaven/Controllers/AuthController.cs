@@ -55,6 +55,7 @@ namespace ReadHaven.Controllers
                     var claims = new List<Claim>
                  {
                     new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
+                   new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
                     new Claim(ClaimTypes.Email, findUser.Email),
                     new Claim(ClaimTypes.Role, findUserRole.Role)
                  };
