@@ -41,7 +41,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">
                                     <i class="bi bi-person"></i> Profile
                                 </a>
                             </li>
@@ -88,6 +88,9 @@
     </div>
 
     <!-- Scripts -->
+    <script>
+        var userRole = "@(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Guest")";
+     </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

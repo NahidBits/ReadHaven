@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReadHaven.Models.Enums;
 using ReadHaven.Models.Order;
+using ReadHaven.Models.User;
 using ReadHaven.Services;
 using System.Security.Claims;
 
@@ -27,28 +29,75 @@ namespace ReadHaven.Controllers
             return View();
         }
 
-        [HttpGet("GetUserOrders")]
-        public IActionResult GetUserOrders()
+        [HttpGet("GetMyOrders")]
+        public IActionResult GetMyOrders()
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             var orders = _context.Orders
-                .Where(o => o.UserId == userId && o.Status == "Pending")
+                .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.OrderDate)
                 .Select(o => new
                 {
                     o.Id,
-                    TotalAmount = o.TotalAmount.ToString("0.00"),
+                    TotalAmount = o.TotalAmount,
                     o.Status,
-                    OrderDate = o.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")
+                    OrderDate = o.OrderDate
                 })
                 .ToList();
 
             return Ok(orders);
         }
 
-        [HttpPost("DeleteOrder")]
-        public IActionResult DeleteOrder(Guid orderId)
+        [HttpGet("GetMyOrdersPending")]
+        public IActionResult GetMyOrdersPending()
+        {
+            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            var orders = _context.Orders
+                .Where(o => o.UserId == userId && o.Status == OrderStatus.Pending)
+                .OrderByDescending(o => o.OrderDate)
+                .Select(o => new
+                {
+                    o.Id,
+                    TotalAmount = o.TotalAmount,
+                    o.Status,
+                    OrderDate = o.OrderDate
+                })
+                .ToList();
+
+            return Ok(orders);
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllUserOrders")]
+        public IActionResult GetUserOrders()
+        {
+            var orders = _context.Orders
+                         .OrderBy(o => o.Status)
+                         .ThenByDescending(o => o.OrderDate)
+                         .ToList();
+
+            return Ok(orders);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("ChangeOrderStatus")]
+        public IActionResult ChangeOrderStatus(Guid orderId,OrderStatus status)
+        {
+            var order = _context.Orders
+                .FirstOrDefault(o => o.Id == orderId);
+
+            order.Status = status;
+            _context.Orders.Update(order);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost("ConfirmOrder")]
+        public IActionResult ConfirmOrder(Guid orderId)
         {
             Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
@@ -58,8 +107,7 @@ namespace ReadHaven.Controllers
             if (order == null)
                 return NotFound();
 
-            order.Status = "Done";               
-            order.UpdatedAt = DateTime.UtcNow;
+            order.Status = OrderStatus.Processing;   
 
             _context.Orders.Update(order);
             _context.SaveChanges();
@@ -79,8 +127,7 @@ namespace ReadHaven.Controllers
             {
                 UserId = userId,
                 TotalAmount = cartItems.Sum(c => c.Price * c.Quantity),
-                OrderDate = DateTime.UtcNow,
-                Status = "Pending"
+                OrderDate = DateTime.UtcNow
             };
 
             _context.Orders.Add(order);

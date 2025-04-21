@@ -1,8 +1,8 @@
-﻿let userRole = ""; // Global User Role
+﻿//let userRole = ""; // Global User Role
 
 // Function to check admin status FIRST
 function checkRoleStatus() {
-    return new Promise((resolve, reject) => {
+    /*return new Promise((resolve, reject) => {
         $.ajax({
             url: "/Auth/GetUserRoleStatus",
             type: "GET",
@@ -18,7 +18,7 @@ function checkRoleStatus() {
                 reject("Error while checking admin status: " + error);
             }
         });
-    });
+    });*/
 }
 function updateCartCountBadge() {
     $.ajax({
