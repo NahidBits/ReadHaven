@@ -6,6 +6,7 @@ using ReadHaven.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseIISIntegration();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -17,6 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true;
     });
+
 builder.Services.AddSession();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped(typeof(GenericRepository<>));

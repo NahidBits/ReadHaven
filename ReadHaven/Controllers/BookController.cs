@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
@@ -10,13 +11,15 @@ namespace ReadHaven.Controllers
 {
     public class BookController : BaseController
     {
+        private readonly AppDbContext _context;
         private readonly BookService _bookService;
         private readonly GenericRepository<Book> _bookRepository;
 
-        public BookController(BookService bookService, GenericRepository<Book> bookRepository)
+        public BookController(BookService bookService, GenericRepository<Book> bookRepository,AppDbContext context)
         {
             _bookService = bookService;
             _bookRepository = bookRepository;
+            _context = context;
         }
 
         // GET: Index
@@ -26,11 +29,28 @@ namespace ReadHaven.Controllers
         }
 
         // GET: GetBookList
-        [HttpGet("GetBookList")]
+        [HttpGet("GetBookListWithRating")]
         public async Task<IActionResult> GetBookList(BookSearchModel searchBook)
         {
             var books = await _bookService.GetBooksWithSearchAsync(searchBook);
-            return Ok(books);
+            var allReviews =_context.BookReviews.ToList();
+
+            var booksWithRating = books.Select(book => new
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Genre = book.Genre,
+                Price = book.Price,
+                ImagePath = book.ImagePath,
+                Rating = (int)Math.Round(allReviews
+                              .Where(r => r.BookId == book.Id)
+                              .Select(r => (int)r.Rating)
+                              .DefaultIfEmpty(0)
+                              .Average())
+                              }).ToList();
+ 
+
+            return Ok(booksWithRating);
         }
 
         // POST: create
