@@ -63,7 +63,7 @@ namespace ReadHaven.Controllers
             return Ok(book);
         }
 
-        // POST: update
+        // POST : update
         [Authorize(Roles = "Admin")]
         [HttpPost("BookUpdate")]
         public async Task<IActionResult> Update([FromForm] Book book, [FromForm] IFormFile image)
