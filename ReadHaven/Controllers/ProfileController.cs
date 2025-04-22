@@ -13,7 +13,7 @@ namespace ReadHaven.Controllers
 {
     [Authorize]
     [Route("[controller]")] 
-    public class ProfileController : Controller
+    public class ProfileController : BaseController
     {
         private readonly AppDbContext _context;
         public ProfileController(AppDbContext context)
@@ -30,10 +30,8 @@ namespace ReadHaven.Controllers
         [HttpGet("GetUserProfile")]
         public IActionResult GetUserProfile()
         {
-            Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
             var user = _context.Users
-                .Where(u => u.Id == userId).FirstOrDefault();
+                .Where(u => u.Id == UserId).FirstOrDefault();
 
             var userProfile = new
             {

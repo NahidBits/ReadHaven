@@ -2,14 +2,13 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
 
 namespace ReadHaven.Controllers
 {
-    public class BookController : Controller
+    public class BookController : BaseController
     {
         private readonly BookService _bookService;
         private readonly GenericRepository<Book> _bookRepository;

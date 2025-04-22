@@ -10,7 +10,7 @@ using ReadHaven.Services;
 namespace ReadHaven.Controllers
 {
     [Route("[controller]")]
-    public class AuthController : Controller
+    public class AuthController : BaseController
     {
         private readonly AppDbContext _context;
         private readonly IEmailSender _emailSender;
@@ -47,24 +47,21 @@ namespace ReadHaven.Controllers
                 if (result == PasswordVerificationResult.Success)
                 {
                     var findUserRole = await _context.UserRoles.FirstOrDefaultAsync(u => u.UserId == findUser.Id);
-
-                    if (findUserRole == null)
-                        return View();
-
+                    if (findUserRole == null) return View();
 
                     var claims = new List<Claim>
-                 {
-                    new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
-                   new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
-                    new Claim(ClaimTypes.Email, findUser.Email),
-                    new Claim(ClaimTypes.Role, findUserRole.Role)
-                 };
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, findUser.Id.ToString()),
+                        new Claim(ClaimTypes.Email, findUser.Email),
+                        new Claim(ClaimTypes.Role, findUserRole.Role)
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                                                   new ClaimsPrincipal(claimsIdentity));
+                        new ClaimsPrincipal(claimsIdentity));
 
                     MergeGuestSessionToUser(findUser.Id);
+
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
 
@@ -72,7 +69,6 @@ namespace ReadHaven.Controllers
                 }
             }
 
-            // If login fails
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -90,37 +86,30 @@ namespace ReadHaven.Controllers
             if (ModelState.IsValid)
             {
                 var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-                if (findUser != null) return View();
-
-                if (user.PasswordHash != confirmPassword) return View();
+                if (findUser != null || user.PasswordHash != confirmPassword) return View();
 
                 var passwordHasher = new PasswordHasher<User>();
                 user.PasswordHash = passwordHasher.HashPassword(user, user.PasswordHash);
 
                 _context.Users.Add(user);
 
-                UserRole userRole = new UserRole
-                {
-                    UserId = user.Id,
-                    Role = "User"
-                };
-
+                var userRole = new UserRole { UserId = user.Id, Role = "User" };
                 await _context.UserRoles.AddAsync(userRole);
                 await _context.SaveChangesAsync();
 
-                // Sign in after registration
                 var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, userRole.Role)
-        };
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, userRole.Role)
+                };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                                               new ClaimsPrincipal(claimsIdentity));
+                    new ClaimsPrincipal(claimsIdentity));
 
                 MergeGuestSessionToUser(user.Id);
+
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
 
@@ -131,18 +120,10 @@ namespace ReadHaven.Controllers
             return View();
         }
 
-
         [HttpGet("GetUserRoleStatus")]
-        public async Task<IActionResult> GetUserRoleStatus()
+        public IActionResult GetUserRoleStatus()
         {
-            var role = await _userService.GetCurrentUserRole();
-
-            if (role != null)
-            {
-                return Ok(role);
-            }
-
-            return Ok("Guest");
+            return Ok(UserRole);
         }
 
         [HttpPost("Logout")]
@@ -153,36 +134,26 @@ namespace ReadHaven.Controllers
         }
 
         [HttpGet("ForgotPassword")]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
+        public IActionResult ForgotPassword() => View();
 
-        // POST: /Auth/ForgotPassword
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-
-            if (user == null)
-            {
-                return View();
-            }
+            if (user == null) return View();
 
             var token = Guid.NewGuid().ToString();
-
-            // Save the token in the database (you can create a ResetPasswordToken table if necessary)
             var resetToken = new ResetPasswordToken
             {
                 UserId = user.Id,
                 Token = token,
-                ExpirationDate = DateTime.UtcNow.AddHours(1) // Token expires in 1 hour
+                ExpirationDate = DateTime.UtcNow.AddHours(1)
             };
+
             _context.ResetPasswordToken.Add(resetToken);
             await _context.SaveChangesAsync();
 
-            // Send the reset link via email
-            var resetLink = Url.Action("ResetPassword", "Auth", new { token = token }, Request.Scheme);
+            var resetLink = Url.Action("ResetPassword", "Auth", new { token }, Request.Scheme);
             var message = $"Click <a href='{resetLink}'>here</a> to reset your password.";
 
             await _emailSender.SendEmailAsync(user.Email, "Password Reset Request", message);
@@ -190,27 +161,19 @@ namespace ReadHaven.Controllers
             return RedirectToAction("ForgotPasswordConfirmation");
         }
 
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
+        public IActionResult ForgotPasswordConfirmation() => View();
 
-
-        // GET: /Auth/ResetPassword
         public IActionResult ResetPassword(string token)
         {
-            var resetToken = _context.ResetPasswordToken.FirstOrDefault(t => t.Token == token && t.ExpirationDate > DateTime.UtcNow);
+            var resetToken = _context.ResetPasswordToken
+                .FirstOrDefault(t => t.Token == token && t.ExpirationDate > DateTime.UtcNow);
 
-            if (resetToken == null)
-            {
-                return RedirectToAction("TokenExpired");
-            }
+            if (resetToken == null) return RedirectToAction("TokenExpired");
 
             var model = new PasswordResetModel { Token = token };
             return View(model);
         }
 
-        // POST: /Auth/ResetPassword
         [HttpPost]
         public async Task<IActionResult> ResetPassword(PasswordResetModel model)
         {
@@ -220,20 +183,13 @@ namespace ReadHaven.Controllers
                 return View(model);
             }
 
-            // Check the token validity
-            var resetToken = _context.ResetPasswordToken.FirstOrDefault(t => t.Token == model.Token && t.ExpirationDate > DateTime.UtcNow);
+            var resetToken = _context.ResetPasswordToken
+                .FirstOrDefault(t => t.Token == model.Token && t.ExpirationDate > DateTime.UtcNow);
 
-            if (resetToken == null)
-            {
-                return RedirectToAction("TokenExpired");
-            }
+            if (resetToken == null) return RedirectToAction("TokenExpired");
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == resetToken.UserId);
-
-            if (user == null)
-            {
-                return RedirectToAction("TokenExpired");
-            }
+            if (user == null) return RedirectToAction("TokenExpired");
 
             var passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = passwordHasher.HashPassword(user, model.NewPassword);
@@ -245,12 +201,9 @@ namespace ReadHaven.Controllers
             return RedirectToAction("Index", "Auth");
         }
 
-        public IActionResult TokenExpired()
-        {
-            return View();
-        }
+        public IActionResult TokenExpired() => View();
 
-        public void MergeGuestSessionToUser(Guid userId)
+        private void MergeGuestSessionToUser(Guid userId)
         {
             var guestCart = _cartService.GetCartItemsForGuest();
             foreach (var item in guestCart)
