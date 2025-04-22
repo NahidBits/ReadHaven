@@ -128,18 +128,11 @@ function addToCart(bookId) {
 // Handle the page load event and check for role status
 window.onload = function () {
     updateCartCountBadge();
-
-    checkRoleStatus()
-        .then(() => {
-            showBookList();  // Show book list after role check
-            if (userRole === "Admin") {
-                const bookForm = document.querySelector("#create-book");
-                if (bookForm) {
-                    bookForm.addEventListener("submit", handleBookFormSubmit);
-                }
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+    showBookList();  
+    if (userRole === "Admin") {
+        const bookForm = document.querySelector("#create-book");
+        if (bookForm) {
+            bookForm.addEventListener("submit", handleBookFormSubmit);
+        }
+    }
 };
