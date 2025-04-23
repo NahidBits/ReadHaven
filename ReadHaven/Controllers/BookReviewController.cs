@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Book;
 using ReadHaven.Models.User;
+using ReadHaven.Models.Enums;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
 
@@ -43,6 +44,33 @@ namespace ReadHaven.Controllers
 
             return Ok(reviewViewModels);
         }
+
+        [HttpGet("GetRatingByBook")]
+        public IActionResult GetRatingByBook(Guid bookId)
+        {
+            var ratingCounts = _context.BookReviews
+                .Where(r => r.BookId == bookId)
+                .GroupBy(r => r.Rating)
+                .Select(g => new
+                {
+                    Rating = (int)g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var allRatings = Enum.GetValues(typeof(BookRating))
+                .Cast<BookRating>()
+                .Select(rating => new
+                {
+                    Rating = (int)rating,
+                    Count = ratingCounts.FirstOrDefault(x => x.Rating == (int)rating)?.Count ?? 0
+                })
+                .OrderByDescending(x => x.Rating) 
+                .ToList();
+
+            return Ok(allRatings);
+        }
+
 
         [Authorize]
         [HttpPost("Save")]

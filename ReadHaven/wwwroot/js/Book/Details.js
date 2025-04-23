@@ -10,9 +10,7 @@ const ratingLabels = {
     5: "Excellent"
 };
 
-
 // Book Section
-
 function populateBookForm(book) {
     $("#Title").val(book.title);
     $("#Genre").val(book.genre);
@@ -38,6 +36,45 @@ function showBook(bookId) {
         }
     });
 }
+function showRating(bookId) {
+    $.get("/BookReview/GetRatingByBook", { bookId: bookId }, function (data) {
+        if (data && data.length > 0) {
+            const ratingBarsContainer = $("#ratingBars");
+            ratingBarsContainer.empty();
+
+            let totalRating = 0;
+            let totalReviews = 0;
+
+            data.forEach(item => {
+                const stars = "★".repeat(item.rating); 
+                const emptyStars = "☆".repeat(5 - item.rating); 
+
+                const ratingLine = `<div class="rating-bar d-flex justify-content-between">
+                    <span class="text-warning">${stars}${emptyStars}</span>
+                    <span class="ms-2 text-muted small">${item.count}</span>
+                </div>`;
+                ratingBarsContainer.append(ratingLine);
+                totalRating += item.rating * item.count;
+                totalReviews += item.count;
+            });
+
+            const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(2) : 0;
+
+            const averageRatingDisplay = `
+                <div class="d-flex justify-content-between mt-3">
+                    <span class="text-warning">${"★".repeat(Math.round(averageRating))}${"☆".repeat(5 - Math.round(averageRating))}</span>
+                    <span class="ms-2 text-muted small">${averageRating} / 5</span>
+                </div>
+            `;
+            ratingBarsContainer.append(averageRatingDisplay);
+
+        } else {
+            $("#ratingBars").html("<div class='text-muted small'>No ratings yet.</div>");
+        }
+    }).fail(function () {
+        showToastMessage("Error loading book rating.", "error");
+    });
+}
 
 function saveBookUpdate() {
     const formData = new FormData(document.getElementById("bookUpdateForm"));
@@ -59,7 +96,6 @@ function saveBookUpdate() {
 }
 
 // Reviews Section
-
 function loadReviews(bookId) {
     $.get("/BookReview/GetReviewsByBook", { id: bookId }, function (data) {
         reviews = data;
@@ -71,7 +107,6 @@ function loadReviews(bookId) {
             $("#reviewDisplay").html("<p class='text-muted text-center'>No reviews yet.</p>");
         }
 
-        // If logged in, check if user already has a review
         if (userId) {
             currentUserReview = reviews.find(r => r.userId === userId);
             populateReviewForm();
@@ -84,16 +119,20 @@ function showReview(index) {
     const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
     const label = ratingLabels[review.rating] || "Unrated";
 
-
     $("#reviewDisplay").html(`
-    <div class="p-3 border rounded shadow-sm text-center">
-        <h6 class="mb-1">${review.userName}</h6>
-        <div class="text-warning fs-4">${stars}</div>
-        <div class="mb-2 text-muted">${label}</div>
-        <p class="fst-italic mb-2">"${review.reviewText}"</p>
-        <small class="text-muted">${new Date(review.date + "T00:00:00").toLocaleDateString()}</small>
-    </div>
-`);
+        <div class="review-item">
+            <div class="review-header">
+                <span class="review-name">${review.userName}</span>
+                <span class="rating">${stars}</span>
+            </div>
+            <div class="review-text">
+                <p>"${review.reviewText}"</p>
+            </div>
+            <div class="review-date text-muted">
+                <small>Posted on: ${new Date(review.date + "T00:00:00").toLocaleDateString()}</small>
+            </div>
+        </div>
+    `);
 }
 
 function previousReview() {
@@ -108,10 +147,7 @@ function nextReview() {
     showReview(currentReviewIndex);
 }
 
-// ----------------------
 // Review Form
-// ----------------------
-
 function populateReviewForm() {
     const review = currentUserReview;
 
@@ -143,6 +179,7 @@ function submitReview(e) {
     $.post("/BookReview/Save", formData, function () {
         showToastMessage("Review saved successfully!", "success");
         loadReviews(bookId);
+        showRating(bookId);
     }).fail(() => {
         showToastMessage("Failed to save review.", "error");
     });
@@ -155,10 +192,11 @@ function deleteReview() {
     $.ajax({
         url: `/BookReview/Delete`,
         type: "DELETE",
-        data: { id: id }, // Send the `id` as part of the request body
+        data: { id: id },
         success: function () {
             showToastMessage("Review deleted.", "info");
-            loadReviews(bookId); // Reload reviews after deletion
+            loadReviews(bookId);
+            showRating(bookId);
         },
         error: function () {
             showToastMessage("Failed to delete review.", "error");
@@ -166,16 +204,11 @@ function deleteReview() {
     });
 }
 
-
-// ----------------------
 // Init
-// ----------------------
-
 document.addEventListener("DOMContentLoaded", () => {
     bookId = window.location.pathname.split("/").pop();
-    checkRoleStatus();
     updateCartCountBadge();
-
     showBook(bookId);
+    showRating(bookId);
     loadReviews(bookId);
 });

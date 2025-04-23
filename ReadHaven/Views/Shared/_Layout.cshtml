@@ -9,47 +9,55 @@
     <link rel="stylesheet" href="~/ReadHaven.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Book" asp-action="Index">ReadHaven</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Project Icon -->
+                <a class="navbar-brand" asp-area="" asp-controller="Book" asp-action="Index">
+                    <img src="~/uploads/logo/logo.png" alt="ReadHaven" style="width: 40px; height: 40px;" class="rounded-circle" /> ReadHaven
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Index">Book</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Index">
+                                <i class="bi bi-book"></i> 
+                            </a>
                         </li>
                     </ul>
 
                     <ul class="navbar-nav d-flex align-items-center">
                         <li class="nav-item position-relative">
                             <a class="nav-link text-dark" href="/BookCart/Index">
-                                <i class="bi bi-cart"></i>
+                                <i class="bi bi-cart fs-5"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count-badge" style="font-size: 0.6rem; display: none;">
                                     0
                                 </span>
-                                Cart
                             </a>
                         </li>
 
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="BookOrder" asp-action="Index">
+                                    <i class="bi bi-box fs-5"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">
-                                    <i class="bi bi-person"></i> Profile
+                                    <i class="bi bi-person fs-5"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <form action="/Auth/Logout" method="post" class="p-0">
-                                    <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">Logout</button>
+                                    <!-- Replaced Text Button with Icon -->
+                                    <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">
+                                        <i class="bi bi-box-arrow-right fs-5"></i>
+                                    </button>
                                 </form>
                             </li>
                         }
@@ -57,7 +65,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Index">
-                                    <i class="bi bi-box-arrow-in-right"></i> Login
+                                    <i class="bi bi-box-arrow-in-right fs-5"></i> Login
                                 </a>
                             </li>
                         }
@@ -92,7 +100,7 @@
     <!-- Scripts -->
     <script>
         var userRole = "@(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Guest")";
-     </script>
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

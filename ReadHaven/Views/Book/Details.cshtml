@@ -3,99 +3,114 @@
 }
 
 <div class="container mt-5" id="book-details-container">
-    <h2 class="mb-4">Book Details</h2>
+    <h4 class="mb-4"><i class="bi bi-book-half me-2"></i>Explore This Book's Story & Details</h4>
 
     @if (User.IsInRole("Admin"))
     {
         <!-- Admin Update Form -->
-        <div class="bg-light p-3 mb-4 rounded shadow-sm">
-            <form id="bookUpdateForm" enctype="multipart/form-data" method="post" class="d-flex align-items-center flex-wrap gap-2">
-                <input type="text" class="form-control w-auto" id="Title" name="Title" placeholder="Title" required />
-                <input type="text" class="form-control w-auto" id="Genre" name="Genre" placeholder="Genre" required />
-                <input type="number" class="form-control w-auto" id="Price" name="Price" step="0.01" placeholder="Price" required />
-                <input type="file" class="form-control w-auto" id="Image" name="Image" accept="image/*" />
+        <div class="bg-white p-3 rounded shadow-sm border mb-4">
+            <form id="bookUpdateForm" enctype="multipart/form-data" method="post" class="d-flex align-items-center flex-nowrap gap-2 overflow-auto">
+                <input type="text" class="form-control form-control-sm w-auto" id="Title" name="Title" placeholder="Title" required />
+                <input type="text" class="form-control form-control-sm w-auto" id="Genre" name="Genre" placeholder="Genre" required />
+                <input type="number" class="form-control form-control-sm w-auto" id="Price" name="Price" step="0.01" placeholder="Price" required />
+                <input type="file" class="form-control form-control-sm w-auto" id="Image" name="Image" accept="image/*" />
                 <input type="hidden" name="Id" id="bookIdField" />
-                <button type="button" class="btn btn-success" onclick="saveBookUpdate()">Save</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="saveBookUpdate()" title="Update">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
             </form>
         </div>
     }
 
-    <!-- Book Display -->
-    <div class="d-flex flex-wrap gap-4 align-items-start">
-        <div class="flex-shrink-0">
-            <img id="bookImage" src="/uploads/book/Default_image.webp" alt="Book Image" class="img-thumbnail" style="max-width: 250px;" />
+    <div class="book-details-wrapper">
+        <!-- Book Display -->
+        <div class="d-flex flex-wrap gap-4 align-items-center flex-grow-1">
+            <div class="flex-shrink-0">
+                <img id="bookImage" src="/uploads/book/Default_image.webp" alt="Book Image" class="book-image" />
+            </div>
+            <div class="flex-grow-1">
+                <p class="mb-1 fs-5"><strong>Title:</strong> <span id="ReadTitle"></span></p>
+                <p class="mb-1 fs-6"><strong>Genre:</strong> <span id="ReadGenre"></span></p>
+                <p class="mb-1 fs-6"><strong>Price:</strong> <span id="ReadPrice"></span></p>
+            </div>
         </div>
-        <div class="flex-grow-1">
-            <p><strong>Title:</strong> <span id="ReadTitle"></span></p>
-            <p><strong>Genre:</strong> <span id="ReadGenre"></span></p>
-            <p><strong>Price:</strong> <span id="ReadPrice"></span></p>
+
+        <!-- Rating Summary -->
+        <div id="ratingBreakdown" class="rating-summary bg-light rounded shadow-sm">
+            <h6 class="fw-bold mb-2">Rating Summary</h6>
+            <div id="ratingBars"></div>
         </div>
     </div>
 
-    <hr />
-    <a href="@Url.Action("Index", "Book")" class="btn btn-primary mt-4">Back to List</a>
-</div>
+    <a href="@Url.Action("Index", "Book")" class="btn btn-outline-secondary rounded-pill px-3 py-1 mt-4 d-inline-flex align-items-center">
+        <i class="bi bi-arrow-left me-2"></i> Back to Book List
+    </a>
 
+    <!-- Combined Review Layout -->
+    <div class="mt-5 d-flex justify-content-between gap-3" id="review-section-wrapper">
+        <!-- Review Section (Left) -->
+        <div id="review-carousel-section" class="p-3 rounded shadow-sm bg-light" style="max-width: 350px;">
+            <h6 class="mb-4"><i class="bi bi-star-fill"></i> Reviews</h6>
+            <div class="d-flex align-items-center justify-content-between">
+                <button class="btn btn-outline-secondary" onclick="previousReview()" title="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
 
-<hr />
-<div class="mt-5" id="review-carousel-section">
-    <h4 class="mb-3">User Reviews</h4>
+                <div id="reviewDisplay" class="flex-grow-1 text-center px-3 small text-muted">
+                    <div>Loading reviews...</div>
+                </div>
 
-    <div class="d-flex align-items-center justify-content-between">
-        <button class="btn btn-outline-secondary" onclick="previousReview()">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-
-        <div id="reviewDisplay" class="flex-grow-1 px-3 text-center">
-            <div class="text-center">Loading reviews...</div>
+                <button class="btn btn-outline-secondary" onclick="nextReview()" title="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
         </div>
 
-        <button class="btn btn-outline-secondary" onclick="nextReview()">
-            <i class="bi bi-chevron-right"></i>
-        </button>
+        <!-- Review Form Section (Right) -->
+        <div id="reviewFormSection" class="p-3 rounded shadow-sm bg-light" style="max-width: 350px;">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form id="reviewForm" onsubmit="submitReview(event)" class="border rounded p-3 bg-white shadow-sm">
+                    <div class="mb-2">
+                        <select name="Rating" id="ratingSelect" class="form-select form-select-sm" required>
+                            <option value="">Select Rating</option>
+                            <option value="1">Bad</option>
+                            <option value="2">Satisfactory</option>
+                            <option value="3">Good</option>
+                            <option value="4">Very Good</option>
+                            <option value="5">Excellent</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="ReviewText" id="reviewTextArea" class="form-control form-control-sm" rows="3" placeholder="Write your review here..." required></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-link p-0" title="Submit">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        </button>
+                        <button type="button" class="btn btn-link p-0 d-none" id="deleteReviewBtn" onclick="deleteReview()" title="Delete">
+                            <i class="bi bi-trash-fill text-danger fs-5"></i>
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="bg-white px-2 py-1 rounded shadow-sm d-flex align-items-center gap-1 border small" style="max-width: fit-content;">
+                    <a href="/Auth/Login" title="Login" class="d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle text-muted" style="font-size: 0.9rem;"></i>
+                        <span class="text-muted" style="font-size: 0.8rem;">Login to review</span>
+                    </a>
+                </div>
+            }
+        </div>
     </div>
-</div>
 
-
-<!-- Review Carousel -->
-<hr />
-<div class="mt-5" id="reviewFormSection">
-    @if (User.Identity.IsAuthenticated)
-    {
-        <form id="reviewForm" onsubmit="submitReview(event)">
-            <div class="mb-2">
-                <label class="form-label">Your Rating:</label>
-                <select name="Rating" id="ratingSelect" class="form-select" required>
-                    <option value="">Select</option>
-                    <option value="1">Bad</option>
-                    <option value="2">Satisfactory</option>
-                    <option value="3">Good</option>
-                    <option value="4">Very Good</option>
-                    <option value="5">Excellent</option>
-                </select>
-            </div>
-            <div class="mb-2">
-                <label class="form-label">Review:</label>
-                <textarea name="ReviewText" id="reviewTextArea" class="form-control" rows="3" required></textarea>
-            </div>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success" id="reviewSubmitBtn" onclick="submitReview(event)">Submit Review</button>
-                <button type="button" class="btn btn-danger d-none" id="deleteReviewBtn" onclick="deleteReview()">Delete</button>
-            </div>
-        </form>
+    @section Scripts {
+        <script>
+            const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+        </script>
+        <script src="~/js/Book/Details.js"></script>
     }
-    else
-    {
-        <a href="/Auth/Login" class="btn btn-outline-primary">Login to write a review</a>
-    }
+    <link href="~/css/Book/Details.css" rel="stylesheet" />
 </div>
-
-@section Scripts {
-    <!-- Razor-injected user info for JS -->
-    <script>
-           const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
-        //   const userRole = "@(User.IsInRole("Admin") ? "Admin" : (User.Identity.IsAuthenticated ? "User" : "Guest"))";
-    </script>
-
-    <script src="~/js/Book/Details.js"></script>
-}
