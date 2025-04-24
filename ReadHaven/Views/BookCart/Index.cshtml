@@ -1,23 +1,23 @@
-@{
+﻿@{
     ViewData["Title"] = "Your Cart";
 }
 
-<h2>Your Cart</h2>
+<h3 class="mb-4 text-muted">🛒 Your Cart</h3>
 
-<div id="cartEmptyMessage" class="alert alert-info" style="display:none;">
-    <p>Your cart is empty!</p>
+<div id="cartEmptyMessage" class="alert alert-warning text-center" style="display:none;">
+    <p class="m-0">🛍️ Your cart is currently empty!</p>
 </div>
 
-<table id="cartTable" class="table" style="display:none;">
-    <thead>
+<table id="cartTable" class="table table-hover table-bordered align-middle shadow-sm rounded" style="display:none;">
+    <thead class="table-dark">
         <tr>
-            <th>Book Title</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Actions</th>
+            <th scope="col">📖 </th>
+            <th scope="col">💵 </th>
+            <th scope="col">🔢 </th>
+            <th scope="col">⚙️ </th>
         </tr>
     </thead>
-    <tbody id="cartItemsTableBody">
+    <tbody id="cartItemsTableBody" class="table-group-divider">
         <!-- Dynamic content will be injected here by JavaScript -->
     </tbody>
 </table>
@@ -26,6 +26,8 @@
     <h3>Total: <span id="totalSum">0</span></h3>
 </div>
 
-<a href="@Url.Action("Index", "BookOrder")" class="btn btn-primary">Place Order</a>
+<a href="@Url.Action("Index", "BookOrder")" class="btn btn-success btn-group-sm">
+    ✅ Place Order
+</a>
 
 <script src="~/js/BookCart/Index.js"></script>

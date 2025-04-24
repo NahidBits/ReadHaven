@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,13 +30,24 @@ namespace ReadHaven.Controllers
         }
 
         // GET: GetBookList
-        [HttpGet("GetBookListWithRating")]
+        [HttpGet("GetBookList")]
         public async Task<IActionResult> GetBookList(BookSearchModel searchBook)
         {
             var books = await _bookService.GetBooksWithSearchAsync(searchBook);
-            var allReviews =_context.BookReviews.ToList();
+            var allReviews = _context.BookReviews.ToList();
+            var userWishlist = new Dictionary<Guid, bool>(); // BookId => IsLoved
 
-            var booksWithRating = books.Select(book => new
+            if (UserId != Guid.Empty)
+            {
+                userWishlist = _context.Wishlists
+                    .Where(w => w.UserId == UserId)
+                    .ToDictionary(
+                        w => w.BookId,
+                        w => w.IsLoved
+                    );
+            }
+
+            var bookList = books.Select(book => new
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -43,15 +55,42 @@ namespace ReadHaven.Controllers
                 Price = book.Price,
                 ImagePath = book.ImagePath,
                 Rating = (int)Math.Round(allReviews
-                              .Where(r => r.BookId == book.Id)
-                              .Select(r => (int)r.Rating)
-                              .DefaultIfEmpty(0)
-                              .Average())
-                              }).ToList();
- 
+                    .Where(r => r.BookId == book.Id)
+                    .Select(r => (int)r.Rating)
+                    .DefaultIfEmpty(0)
+                    .Average()),
 
-            return Ok(booksWithRating);
+                IsLoved = userWishlist.TryGetValue(book.Id, out var isLoved) && isLoved
+            }).ToList();
+
+            return Ok(bookList);
         }
+
+        [Authorize]
+        [HttpPost("Wishlist")]
+        public async Task<IActionResult> UpdateToWishlist(Guid bookId)
+        {
+            var wishlist = await _context.Wishlists
+                .FirstOrDefaultAsync(w => w.UserId == UserId && w.BookId == bookId);
+            if (wishlist != null)
+            {
+                wishlist.IsLoved = !wishlist.IsLoved;
+                _context.Wishlists.Update(wishlist);
+            }
+            else
+            {
+                wishlist = new Wishlist
+                {
+                    UserId = UserId,
+                    BookId = bookId,
+                    IsLoved = true
+                };
+                await _context.Wishlists.AddAsync(wishlist);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(new { success = true });
+        }
+
 
         // POST: create
         [Authorize(Roles = "Admin")]

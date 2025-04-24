@@ -60,10 +60,9 @@ function applyFilters() {
 }
 
 // Render Book List
-// Render Book List
 function showBookList(searchData = {}) {
     $.ajax({
-        url: "/GetBookListWithRating",
+        url: "/GetBookList",
         type: "GET",
         data: searchData,
         dataType: "json",
@@ -82,6 +81,15 @@ function showBookList(searchData = {}) {
                 const genre = book.genre || 'N/A';
                 const stars = "★".repeat(book.rating) + "☆".repeat(5 - book.rating);
 
+                const isLoved = book.isLoved === true;
+                const loveButton = isAuthenticated ? `
+                    <button 
+                        class="btn btn-outline-danger btn-sm wishlist-btn ${isLoved ? 'isLoved' : ''}" 
+                        onclick="toggleWishlist('${book.id}', this)" 
+                        title="${isLoved ? 'Remove from Wishlist' : 'Add to Wishlist'}">
+                        <i class="bi ${isLoved ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                    </button>` : '';
+
                 const col = document.createElement("div");
                 col.className = "col-md-6 col-lg-4";
 
@@ -89,7 +97,9 @@ function showBookList(searchData = {}) {
                     <div class="card shadow-sm h-100 book-card">
                         <div class="card-body d-flex">
                             <div class="image-container">
-                                <img src="${imagePath}" alt="${title}" class="rounded shadow-sm" style="width: 110px; height: 160px; object-fit: cover;">
+                                <a href="/Details/${book.id}">
+                                    <img src="${imagePath}" alt="${title}" class="rounded shadow-sm" style="width: 110px; height: 160px; object-fit: cover;">
+                                </a>
                             </div>
                             <div class="book-info ms-3 d-flex flex-column justify-content-between">
                                 <div>
@@ -105,11 +115,11 @@ function showBookList(searchData = {}) {
                                     ${userRole === "Admin" ? `
                                         <button class="btn btn-outline-danger btn-sm" onclick="deleteBook('${book.id}')" title="Delete Book">
                                             <i class="bi bi-trash"></i>
-                                        </button>
-                                    ` : ""}
+                                        </button>` : ""}
                                     <button class="btn btn-outline-primary btn-sm" onclick="addToCart('${book.id}')" title="Add to Cart">
                                         <i class="bi bi-cart-plus"></i>
                                     </button>
+                                    ${loveButton}
                                 </div>
                             </div>
                         </div>
@@ -125,6 +135,27 @@ function showBookList(searchData = {}) {
         }
     });
 }
+
+function toggleWishlist(bookId, btn) {
+    $.ajax({
+        url: `/Wishlist`,
+        type: "POST",
+        data: { bookId: bookId },
+        success: function () {
+            const icon = btn.querySelector("i");
+            btn.classList.toggle("isLoved");
+
+            const isWishlisted = btn.classList.contains("isLoved");
+            icon.className = `bi ${isWishlisted ? "bi-heart-fill" : "bi-heart"}`;
+            btn.setAttribute("title", isWishlisted ? "Remove from Wishlist" : "Add to Wishlist");
+        },
+        error: function (xhr) {
+            console.error("Error updating wishlist:", xhr.responseText);
+            showToastMessage("Could not update wishlist", "error");
+        }
+    });
+}
+
 
 // Delete a book
 function deleteBook(bookId) {

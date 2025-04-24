@@ -39,7 +39,9 @@ function loadCartData() {
                             <button class="btn btn-sm btn-secondary" onclick="changeQuantity('${id}', 1,${price})">+</button>
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-danger" onclick="removeItem('${id}')">Remove</button>
+                          <button class="btn btn-sm btn-danger" onclick="removeItem('${id}')" title="Remove">
+                          <i class="bi bi-trash-fill"></i>
+                          </button>
                         </td>
                     </tr>
                 `;

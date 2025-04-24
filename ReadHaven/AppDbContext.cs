@@ -23,6 +23,7 @@ namespace ReadHaven
         public DbSet<ResetPasswordToken> ResetPasswordToken { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,7 @@ namespace ReadHaven
             modelBuilder.Entity<ResetPasswordToken>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<CartItem>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<Order>().HasQueryFilter(u => !u.IsDeleted);
+            modelBuilder.Entity<Wishlist>().HasQueryFilter(u => !u.IsDeleted);
         }
 
         public override int SaveChanges()
