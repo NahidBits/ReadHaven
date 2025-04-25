@@ -12,7 +12,7 @@
                             <td>$${order.totalAmount}</td>
                             <td>${formatDate(order.orderDate)}</td>
                             <td>
-                                <button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">Done</button>
+                                <button class="btn btn-success btn-sm" onclick="handleOrderConfirmed('${order.id}')">Done</button>
                             </td>
                         </tr>
                     `;
@@ -51,6 +51,14 @@ function completeOrder(orderId) {
             showToastMessage("Failed to complete the order.", "danger");
         }
     });
+}
+
+function handleOrderConfirmed(orderId) {
+    fetch(`/Payment/LoadPayment?orderId=${orderId}`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("paymentSection").innerHTML = html;
+        });
 }
 
 window.onload = function () {

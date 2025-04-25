@@ -41,7 +41,7 @@ button.accept-policy {
 /* Minimized footer with left logo, motto, and right contact information */
 .readhaven-footer {
     background: #212529;
-    font-size: 0.75rem; /* Smaller font */
+    font-size: 0.75rem; 
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
@@ -50,6 +50,7 @@ button.accept-policy {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-top: auto;
     }
 
     .readhaven-footer .logo-text {
