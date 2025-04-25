@@ -18,19 +18,9 @@
                 <a class="navbar-brand" asp-area="" asp-controller="Book" asp-action="Index">
                     <img src="~/uploads/logo/logo.png" alt="ReadHaven" style="width: 55px; height: 55px;" class="rounded-circle" /> ReadHaven
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Index">
-                                <i class="bi bi-book"></i> 
-                            </a>
-                        </li>
-                    </ul>
 
-                    <ul class="navbar-nav d-flex align-items-center">
+                <div class="navbar-collapse collapse d-sm-inline-flex">
+                    <ul class="navbar-nav d-flex align-items-center ms-auto">
                         <li class="nav-item position-relative">
                             <a class="nav-link text-dark" href="/BookCart/Index">
                                 <i class="bi bi-cart fs-5"></i>
@@ -54,7 +44,6 @@
                             </li>
                             <li class="nav-item">
                                 <form action="/Auth/Logout" method="post" class="p-0">
-                                    <!-- Replaced Text Button with Icon -->
                                     <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">
                                         <i class="bi bi-box-arrow-right fs-5"></i>
                                     </button>
@@ -81,9 +70,33 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="readhaven-footer text-white">
         <div class="container">
-            &copy; 2025 - ReadHaven - <a asp-area="" asp-controller="Book" asp-action="Privacy">Privacy</a>
+            <!-- Left: Logo, Text, and Motto -->
+            <div class="logo-text">
+                <a asp-area="" asp-controller="Book" asp-action="Index" class="text-white text-decoration-none d-flex align-items-center">
+                    <img src="~/uploads/logo/logo.png" alt="ReadHaven Logo" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                    <strong class="fs-6 mb-0">ReadHaven</strong>
+                </a>
+                <div class="motto">
+                    <small>Your book companion, always here for you.</small>
+                </div>
+            </div>
+
+            <!-- Right: Contact Information and Social Links -->
+            <div class="contact-info">
+                <div class="contact-info-left">
+                    <small><i class="bi bi-envelope me-1"></i> support@readhaven.com</small>
+                    <small><i class="bi bi-phone me-1"></i> +880-1234-567890</small>
+                    <small><i class="bi bi-geo-alt me-1"></i> Dhaka, Bangladesh</small>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="text-white"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
         </div>
     </footer>
 

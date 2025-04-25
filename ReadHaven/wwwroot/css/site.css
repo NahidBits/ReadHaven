@@ -1,32 +1,32 @@
+/* General styles */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
 }
 
+main {
+    flex: 1;
+}
 
+/* Navbar styles */
 .navbar {
     background-color: #f0f0f0;
-    height : 50px;
+    height: 50px;
 }
-
 
 .navbar-nav .nav-link:hover {
     color: #FFFFFF !important;
@@ -39,13 +39,45 @@ body {
 }
 
 .navbar-toggler-icon {
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
 }
 
 .navbar-collapse {
-    text-align: center; 
+    text-align: center;
 }
 
 .navbar-nav .nav-item {
     padding: 0 10px;
+}
+
+/* Focus styles */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* Footer styles */
+.readhaven-footer {
+    background: #212529;
+    font-size: 0.85rem;
+    margin-bottom: 0; /* Remove extra space */
+}
+
+    .readhaven-footer a:hover {
+        color: #fff !important;
+        text-decoration: none;
+    }
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+button.btn-link {
+    text-decoration: none !important;
+}
+
+/* Optional tweaks */
+.container:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
