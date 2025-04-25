@@ -35,7 +35,7 @@ namespace ReadHaven.Controllers
         {
             var books = await _bookService.GetBooksWithSearchAsync(searchBook);
             var allReviews = _context.BookReviews.ToList();
-            var userWishlist = new Dictionary<Guid, bool>(); // BookId => IsLoved
+            var userWishlist = new Dictionary<Guid, bool>();
 
             if (UserId != Guid.Empty)
             {
@@ -64,6 +64,13 @@ namespace ReadHaven.Controllers
             }).ToList();
 
             return Ok(bookList);
+        }
+
+        [HttpGet("GetBookCount")]
+        public async Task<IActionResult> GetBookCount()
+        {
+            var count = await _bookRepository.GetCountAsync(); 
+            return Ok(count);
         }
 
         [Authorize]
@@ -146,5 +153,31 @@ namespace ReadHaven.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetBookSales")]
+        public async Task<IActionResult> GetBookSales()
+        {
+            var salesData = await _context.CartItems
+                .IgnoreQueryFilters()
+                .Where(c => c.IsDeleted)
+                .Join(_context.Books,  
+                      cartItem => cartItem.BookId, 
+                      book => book.Id,  
+                      (cartItem, book) => new { cartItem, book })  
+                .GroupBy(c => new { c.book.Id, c.book.Title,c.book.ImagePath })
+                .Select(g => new
+                {
+                    BookId = g.Key.Id,
+                    ImageUrl = g.Key.ImagePath,
+                    Title = g.Key.Title,
+                    QuantitySold = g.Sum(x => x.cartItem.Quantity)  
+                })
+                .OrderByDescending(x => x.QuantitySold)  
+                .ToListAsync(); 
+
+            return Ok(salesData); 
+        }
+
     }
 }

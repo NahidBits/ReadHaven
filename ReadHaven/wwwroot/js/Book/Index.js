@@ -1,4 +1,15 @@
-﻿// Show success or error toast
+﻿let currentPage = 1;
+let totalPages = 1;
+let searchData = {
+    Title: null,
+    Genre: null,
+    PriceSort: null,
+    StartIndex: 1,
+    EndIndex: 9
+};
+
+
+// Show success or error toast
 function showToastMessage(message, type = "success") {
     const toastClass = type === "error" ? "bg-danger text-white" : "bg-success text-white";
     const toast = document.createElement("div");
@@ -46,21 +57,15 @@ function handleBookFormSubmit(event) {
 
 // Apply filters for search
 function applyFilters() {
-    const title = document.getElementById("searchInput").value.trim();
-    const genre = document.getElementById("genreInput").value.trim();
-    const priceSort = parseInt(document.getElementById("priceSortSelect").value) || null;
+    searchData.Title = document.getElementById("searchInput").value.trim() || null;
+    searchData.Genre = document.getElementById("genreInput").value.trim() || null;
+    searchData.PriceSort = parseInt(document.getElementById("priceSortSelect").value) || null;
 
-    const searchData = {
-        Title: title || null,
-        Genre: genre || null,
-        PriceSort: priceSort || null
-    };
-
-    showBookList(searchData);
+    showBookList();
 }
 
 // Render Book List
-function showBookList(searchData = {}) {
+function showBookList() {
     $.ajax({
         url: "/GetBookList",
         type: "GET",
@@ -104,8 +109,8 @@ function showBookList(searchData = {}) {
                             <div class="book-info ms-3 d-flex flex-column justify-content-between">
                                 <div>
                                     <h5>${title}</h5>
-                                    <p class="mb-1"><strong>Genre:</strong> ${genre}</p>
-                                    <p class="mb-0"><strong>Price:</strong> ${formattedPrice}</p>
+                                    <p class="mb-1"><strong></strong> ${genre}</p>
+                                    <p class="mb-0"><strong></strong> ${formattedPrice}</p>
                                     <p class="mb-1 text-warning fs-6" title="${book.rating}/5">${stars}</p>
                                 </div>
                                 <div class="d-flex justify-content-start gap-2 book-actions">
@@ -208,10 +213,75 @@ function updateCartCountBadge() {
     });
 }
 
+// Pagination
+
+function renderPagination() {
+    const container = document.getElementById("paginationContainer");
+    container.innerHTML = "";
+
+    const createPageButton = (pageNum, innerHtml, isActive = false, disabled = false) => {
+        if (isActive) return; // 👈 Skip rendering the current page button
+
+        const btn = document.createElement("button");
+        btn.innerHTML = innerHtml;
+        btn.disabled = disabled;
+        btn.className = `btn btn-sm mx-1 ${isActive ? "btn-primary" : "btn-outline-secondary"}`;
+        btn.onclick = () => {
+            if (pageNum !== currentPage && !disabled) {
+                currentPage = Math.min(pageNum, totalPages);
+                currentPage = Math.max(pageNum, 1);
+                sessionStorage.setItem("bookCurrentPage", currentPage);
+                searchData.StartIndex = Math.max((currentPage - 1) * 9 + 1, 0);
+                searchData.EndIndex = searchData.StartIndex + 9 - 1;
+                showBookList();
+                renderPagination();
+            }
+        };
+        container.appendChild(btn);
+    };
+
+    createPageButton(currentPage - 1, '<i class="bi bi-chevron-left"></i>', false, currentPage === 1);
+
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+    if (endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+        createPageButton(i, `<span>${i}</span>`, i === currentPage);
+    }
+
+    createPageButton(currentPage + 1, '<i class="bi bi-chevron-right"></i>', false, currentPage === totalPages);
+}
+
+
+function loadTotalPages() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/GetBookCount",
+            type: "GET",
+            success: function (count) {
+                totalPages = Math.ceil(count / 9); 
+                resolve();
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to get total pages:", error);
+                reject(error);
+            }
+        });
+    });
+}
+
 // Initialize on page load
-window.onload = function () {
+window.onload = async function () {
     updateCartCountBadge();
-    showBookList();
+
+    try {
+        await loadTotalPages();
+        renderPagination();    
+        showBookList();         
+    } catch (error) {
+        showToastMessage("Failed to initialize page.", "error");
+    }
 
     if (userRole === "Admin") {
         const form = document.querySelector("#create-book");

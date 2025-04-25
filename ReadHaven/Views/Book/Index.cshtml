@@ -46,7 +46,7 @@
             </select>
         </div>
         <div class="col-md-2 d-flex align-items-center">
-            <button onclick="applyFilters()" class="btn btn-primary btn-sm w-100" title="Apply Filters">
+            <button onclick="applyFilters()" class="btn btn-primary btn-sm w-30" title="Apply Filters">
                 <i class="bi bi-funnel"></i>
             </button>
         </div>
@@ -54,8 +54,14 @@
 
     <div id="bookCardContainer" class="row g-4">
     </div>
+
+    <div class="d-flex justify-content-end mt-4" style="position: relative;">
+        <div id="paginationContainer">
+            <!-- Pagination buttons will be rendered here -->
+        </div>
+    </div>
+
 </div>
 
 <script src="~/js/Book/Index.js"></script>
-
 <link href="~/css/Book/Index.css" rel="stylesheet" />

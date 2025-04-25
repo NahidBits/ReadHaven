@@ -207,6 +207,7 @@ function deleteReview() {
 // Init
 document.addEventListener("DOMContentLoaded", () => {
     bookId = window.location.pathname.split("/").pop();
+
     updateCartCountBadge();
     showBook(bookId);
     showRating(bookId);

@@ -45,6 +45,11 @@ namespace ReadHaven.Services
                 }
             }
 
+            if (searchModel.StartIndex > 0 && searchModel.EndIndex >= searchModel.StartIndex)
+            {
+                query = query.Skip(searchModel.StartIndex - 1).Take(searchModel.EndIndex - searchModel.StartIndex + 1);
+            }
+
             return await query.ToListAsync();
         }
 
