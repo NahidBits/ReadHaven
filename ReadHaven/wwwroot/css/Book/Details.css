@@ -1,0 +1,219 @@
+/* Book Details Container */
+#book-details-container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+}
+
+    /* Book and Rating Wrapper */
+    #book-details-container .book-details-wrapper {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+/* Book Info Section (image + text) */
+.book-info {
+    display: flex;
+    gap: 16px;
+    flex-grow: 1;
+    align-items: flex-start;
+}
+
+/* Book Image Styling */
+.book-image {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ddd;
+}
+
+/* Book Text Details */
+.book-text h2 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+    color: #222;
+}
+
+.book-text p {
+    margin: 4px 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+/* Rating Summary External Style */
+.rating-summary {
+    min-width: 220px;
+    max-width: 260px;
+    padding: 15px 20px;
+    margin-top: 0;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+    .rating-summary h5 {
+        font-size: 1.25rem;
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+/* Rating Bar Styling */
+.rating-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+    .rating-bar .label {
+        width: 35px;
+        font-weight: 500;
+    }
+
+    .rating-bar .bar {
+        flex: 1;
+        height: 8px;
+        background-color: #e4e4e4;
+        margin: 0 6px;
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .rating-bar .fill {
+        height: 100%;
+        background-color: #ffc107;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+/* Review Section Layout */
+#review-section-wrapper {
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* Review Carousel Section */
+#review-carousel-section {
+    max-width: 350px;
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+    #review-carousel-section h5 {
+        font-size: 1.25rem;
+        color: #333;
+        font-weight: bold;
+    }
+
+/* Review Form Section */
+#reviewFormSection {
+    max-width: 350px;
+    flex-grow: 1;
+    margin: 0;
+}
+
+/* Review Form Button Link */
+#reviewForm .btn-link {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+    #reviewForm .btn-link i {
+        cursor: pointer;
+    }
+
+/* Review Form Styling */
+#reviewFormSection .form-control {
+    font-size: 0.9rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+
+#reviewFormSection button {
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+    #reviewFormSection button:hover {
+        background-color: #218838;
+    }
+
+/* Back to Book List Button */
+.btn-outline-secondary {
+    font-size: 0.875rem;
+    padding: 8px 12px;
+    border-radius: 50px;
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    transition: all 0.3s;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+/* Loader Animation for Review Section */
+#reviewFormSection .loading {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+    #reviewFormSection .loading::after {
+        content: "⏳ Loading...";
+    }
+
+/* Optional Delete Button for Review */
+#deleteReviewBtn {
+    color: red;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Optional: Review Form when Logged Out */
+#reviewFormSection .bg-white {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+    #reviewFormSection .bg-white .d-flex {
+        gap: 5px;
+        align-items: center;
+    }
+
+        #reviewFormSection .bg-white .d-flex a {
+            font-size: 0.875rem;
+            color: #007bff;
+        }
+
+            #reviewFormSection .bg-white .d-flex a:hover {
+                text-decoration: underline;
+            }

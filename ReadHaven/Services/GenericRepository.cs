@@ -28,6 +28,12 @@ namespace ReadHaven.Services
             return await _dbSet.ToListAsync();
         }
 
+        // Read Count (Get all)
+        public async Task<int> GetCountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
+
         // Read (Get by Id)
         public async Task<T> GetByIdAsync(object id)
         {

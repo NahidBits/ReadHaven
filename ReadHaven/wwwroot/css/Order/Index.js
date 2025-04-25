@@ -10,7 +10,7 @@
                     rowsHtml += `
                         <tr>
                             <td>$${order.totalAmount}</td>
-                            <td>${formatDate(order.orderDate)}</td>
+                            <td>${new Date(order.orderDate).toLocaleString()}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" onclick="completeOrder('${order.id}')">Done</button>
                             </td>

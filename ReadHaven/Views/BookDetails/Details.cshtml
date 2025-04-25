@@ -1,84 +1,99 @@
-@using ReadHaven.Models.Enums
+﻿@using ReadHaven.Models.Enums
 
 @{
     ViewData["Title"] = "Book Details";
 }
 
 <div class="container mt-5" id="book-details-container">
-    <h2 class="mb-4">Book Details</h2>
+    <h2 class="mb-4">📚 Book Details</h2>
 
     @if (User.IsInRole("Admin"))
     {
-        <!-- Admin Update Form (Inline, compact style) -->
-        <div class="bg-light p-3 mb-4 rounded shadow-sm">
-            <form id="bookUpdateForm" enctype="multipart/form-data" method="post" class="d-flex align-items-center flex-wrap gap-2">
-                <input type="text" class="form-control w-auto" id="Title" name="Title" placeholder="Title" required />
-                <input type="text" class="form-control w-auto" id="Genre" name="Genre" placeholder="Genre" required />
-                <input type="number" class="form-control w-auto" id="Price" name="Price" step="0.01" placeholder="Price" required />
-                <input type="file" class="form-control w-auto" id="Image" name="Image" accept="image/*" />
-                <input type="hidden" name="Id" id="bookIdField" value="" />
-                <button type="button" class="btn btn-success" onclick="saveBookUpdate()">Save</button>
+        <!-- Admin Inline Book Update Form -->
+        <div class="bg-light p-4 rounded shadow-sm mb-4">
+            <h5 class="mb-3">Edit Book</h5>
+            <form id="bookUpdateForm" enctype="multipart/form-data" method="post" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm" id="Title" name="Title" placeholder="Title" required />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm" id="Genre" name="Genre" placeholder="Genre" required />
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" id="Price" name="Price" placeholder="Price" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="file" class="form-control form-control-sm" id="Image" name="Image" accept="image/*" />
+                </div>
+                <div class="col-md-auto">
+                    <input type="hidden" name="Id" id="bookIdField" />
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveBookUpdate()">
+                        <i class="bi bi-save me-1"></i> Save
+                    </button>
+                </div>
             </form>
         </div>
     }
 
-    <!-- Book Details Display -->
-    <div class="d-flex flex-wrap gap-4 align-items-start">
-        <!-- Image Section -->
-        <div class="flex-shrink-0">
-            <img id="bookImage" src="/uploads/book/Default_image.webp" alt="Book Image" class="img-thumbnail" style="max-width: 250px;" />
+    <!-- Book Display Section -->
+    <div class="row g-4 align-items-start">
+        <!-- Image -->
+        <div class="col-md-4 text-center">
+            <img id="bookImage" src="/uploads/book/Default_image.webp" alt="Book Image" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
         </div>
 
-        <!-- Text Details Section -->
-        <div class="flex-grow-1">
-            <p><strong>Title:</strong> <span id="ReadTitle"></span></p>
-            <p><strong>Genre:</strong> <span id="ReadGenre"></span></p>
-            <p><strong>Price:</strong> <span id="ReadPrice"></span></p>
+        <!-- Details -->
+        <div class="col-md-8">
+            <div class="mb-2"><strong>Title:</strong> <span id="ReadTitle"></span></div>
+            <div class="mb-2"><strong>Genre:</strong> <span id="ReadGenre"></span></div>
+            <div class="mb-2"><strong>Price:</strong> <span id="ReadPrice"></span></div>
+
+            <a href="@Url.Action("Index", "Book")" class="btn btn-outline-primary mt-3">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
         </div>
     </div>
 
-    <hr />
-    <a href="@Url.Action("Index", "Book")" class="btn btn-primary mt-4">Back to List</a>
-</div>
+    <hr class="my-5" />
 
-<hr />
-<div class="mt-5" id="review-carousel-section">
-    <h4 class="mb-3">User Reviews</h4>
+    <!-- Review Carousel -->
+    <div id="review-carousel-section">
+        <h4 class="mb-3">User Reviews</h4>
+        <div class="d-flex align-items-center justify-content-between">
+            <button class="btn btn-outline-secondary btn-sm" onclick="previousReview()">
+                <i class="bi bi-chevron-left"></i>
+            </button>
 
-    <div class="d-flex align-items-center justify-content-between">
-        <!-- Left Button -->
-        <button class="btn btn-outline-secondary" onclick="previousReview()">
-            <i class="bi bi-chevron-left"></i>
-        </button>
+            <div id="reviewDisplay" class="flex-grow-1 px-3 text-center">
+                <span class="text-muted">Loading reviews...</span>
+            </div>
 
-        <!-- Review Display -->
-        <div id="reviewDisplay" class="flex-grow-1 px-3">
-            <div class="text-center">Loading reviews...</div>
+            <button class="btn btn-outline-secondary btn-sm" onclick="nextReview()">
+                <i class="bi bi-chevron-right"></i>
+            </button>
         </div>
-
-        <!-- Right Button -->
-        <button class="btn btn-outline-secondary" onclick="nextReview()">
-            <i class="bi bi-chevron-right"></i>
-        </button>
     </div>
-</div>
 
-<hr />
-<div class="mt-4" id="review-section">
-    @if (!User.Identity.IsAuthenticated)
-    {
-        <!-- Guest Message -->
-        <div class="text-center">
-            <p class="text-muted">Please <a href="/Account/Login">log in</a> to write a review.</p>
-        </div>
-    }
-    else
-    {
-        <!-- Authenticated User Review Form (Will be filled by JS) -->
-        <div id="userReviewContainer">
-            <div class="text-center text-muted">Loading your review...</div>
-        </div>
-    }
+    <hr class="my-5" />
+
+    <!-- Review Submission Section -->
+    <div id="review-section">
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <div class="text-center">
+                <p class="text-muted">Please <a href="/Account/Login">log in</a> to write a review.</p>
+            </div>
+        }
+        else
+        {
+            <div id="userReviewContainer">
+                <div class="text-center text-muted">Loading your review...</div>
+            </div>
+        }
+    </div>
 </div>
 
 <script src="~/js/Book/Details.js"></script>

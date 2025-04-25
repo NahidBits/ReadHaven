@@ -9,47 +9,44 @@
     <link rel="stylesheet" href="~/ReadHaven.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Book" asp-action="Index">ReadHaven</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Index">Book</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <!-- Project Icon -->
+                <a class="navbar-brand" asp-area="" asp-controller="Book" asp-action="Index">
+                    <img src="~/uploads/logo/logo.png" alt="ReadHaven" style="width: 55px; height: 55px;" class="rounded-circle" /> ReadHaven
+                </a>
 
-                    <ul class="navbar-nav d-flex align-items-center">
+                <div class="navbar-collapse collapse d-sm-inline-flex">
+                    <ul class="navbar-nav d-flex align-items-center ms-auto">
                         <li class="nav-item position-relative">
                             <a class="nav-link text-dark" href="/BookCart/Index">
-                                <i class="bi bi-cart"></i>
+                                <i class="bi bi-cart fs-5"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count-badge" style="font-size: 0.6rem; display: none;">
                                     0
                                 </span>
-                                Cart
                             </a>
                         </li>
 
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="BookOrder" asp-action="Index">
+                                    <i class="bi bi-box fs-5"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">
-                                    <i class="bi bi-person"></i> Profile
+                                    <i class="bi bi-person fs-5"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <form action="/Auth/Logout" method="post" class="p-0">
-                                    <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">Logout</button>
+                                    <button type="submit" class="btn btn-link text-dark p-0" style="text-decoration: none;">
+                                        <i class="bi bi-box-arrow-right fs-5"></i>
+                                    </button>
                                 </form>
                             </li>
                         }
@@ -57,7 +54,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Index">
-                                    <i class="bi bi-box-arrow-in-right"></i> Login
+                                    <i class="bi bi-box-arrow-in-right fs-5"></i> Login
                                 </a>
                             </li>
                         }
@@ -73,9 +70,33 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="readhaven-footer text-white">
         <div class="container">
-            &copy; 2025 - ReadHaven - <a asp-area="" asp-controller="Book" asp-action="Privacy">Privacy</a>
+            <!-- Left: Logo, Text, and Motto -->
+            <div class="logo-text">
+                <a asp-area="" asp-controller="Book" asp-action="Index" class="text-white text-decoration-none d-flex align-items-center">
+                    <img src="~/uploads/logo/logo.png" alt="ReadHaven Logo" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                    <strong class="fs-6 mb-0">ReadHaven</strong>
+                </a>
+                <div class="motto">
+                    <small>Your book companion, always here for you.</small>
+                </div>
+            </div>
+
+            <!-- Right: Contact Information and Social Links -->
+            <div class="contact-info">
+                <div class="contact-info-left">
+                    <small><i class="bi bi-envelope me-1"></i> support@readhaven.com</small>
+                    <small><i class="bi bi-phone me-1"></i> +880-1234-567890</small>
+                    <small><i class="bi bi-geo-alt me-1"></i> Dhaka, Bangladesh</small>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="text-white"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -91,8 +112,10 @@
 
     <!-- Scripts -->
     <script>
-        var userRole = "@(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Guest")";
-     </script>
+        const userRole = "@(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Guest")";
+        const isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
+        const userId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

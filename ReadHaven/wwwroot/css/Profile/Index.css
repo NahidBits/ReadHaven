@@ -1,0 +1,17 @@
+﻿.table td, .table th {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+}
+
+thead.table-light th {
+    background-color: #f8f9fa !important; 
+    font-weight: 600;
+    color: #212529;
+}

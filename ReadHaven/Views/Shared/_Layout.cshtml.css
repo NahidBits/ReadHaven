@@ -1,5 +1,4 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+﻿
 
 a.navbar-brand {
   white-space: normal;
@@ -39,13 +38,68 @@ button.accept-policy {
   line-height: inherit;
 }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+/* Minimized footer with left logo, motto, and right contact information */
+.readhaven-footer {
+    background: #212529;
+    font-size: 0.75rem; /* Smaller font */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
+
+    .readhaven-footer .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .readhaven-footer .logo-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align items to the left */
+        gap: 5px;
+        margin-left: 20px; /* Add margin to the left to ensure consistent alignment */
+    }
+
+        .readhaven-footer .logo-text .motto {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+    .readhaven-footer .contact-info {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 15px;
+        margin-right: 20px; /* Add margin to the right to ensure consistent alignment */
+    }
+
+    .readhaven-footer .social-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .readhaven-footer a:hover {
+        color: #fff !important;
+        text-decoration: none;
+    }
+
+    .readhaven-footer small {
+        color: #aaa; /* Light text color */
+    }
+
+    .readhaven-footer .social-links a {
+        font-size: 1.2rem;
+    }
+
+    .readhaven-footer .contact-info small {
+        display: block;
+    }
+
+    .readhaven-footer .d-flex {
+        width: 100%;
+    }
+
 
 .button.btn-link {
     text-decoration: none !important;
