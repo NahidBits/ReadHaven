@@ -24,7 +24,7 @@
                         <li class="nav-item position-relative">
                             <a class="nav-link text-dark" href="/BookCart/Index">
                                 <i class="bi bi-cart fs-5"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count-badge" style="font-size: 0.6rem; display: none;">
+                                <span id="cart-count-badge" class="position-absolute top-0 start-100 rounded-pill" >
                                     0
                                 </span>
                             </a>
@@ -32,11 +32,6 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="BookOrder" asp-action="Index">
-                                    <i class="bi bi-box fs-5"></i>
-                                </a>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">
                                     <i class="bi bi-person fs-5"></i>

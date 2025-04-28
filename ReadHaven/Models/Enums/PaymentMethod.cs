@@ -1,9 +1,7 @@
-﻿namespace ReadHaven.Models
+﻿namespace ReadHaven.Models.Enums
 {
     public enum PaymentMethod
     {
-        Email = 0,
-        Paypal = 1, 
-        Bkash = 2  
+        Email = 0
     }
 }

@@ -38,6 +38,31 @@ button.accept-policy {
   line-height: inherit;
 }
 
+.nav-item.position-relative {
+    position: relative;
+}
+
+#cart-count-badge {
+    position: absolute;
+    top: -10px; /* Adjust this to bring it closer or further from the icon */
+    right: -10px; /* Adjust this to bring it closer or further from the icon */
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem; /* Adds some space inside the badge */
+    border-radius: 50%; /* Ensures it's round */
+    background-color: #dc3545; /* Red background for the badge */
+    color: white; /* White color for the number */
+    font-weight: bold; /* Make the number bold for better visibility */
+    transform: translate(50%, -50%); /* Keep it centered on the cart icon */
+    z-index: 10;
+}
+
+.nav-link {
+    display: inline-flex; /* Ensure the cart icon and badge stay aligned */
+    align-items: center;
+}
+
+
+
 /* Minimized footer with left logo, motto, and right contact information */
 .readhaven-footer {
     background: #212529;

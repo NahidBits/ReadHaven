@@ -4,6 +4,8 @@ using ReadHaven.Services;
 using ReadHaven.Models.Enums;
 using System;
 using ReadHaven.ViewModels;
+using Payment.Models;
+using ReadHaven.Models;
 
 namespace ReadHaven.Controllers
 {
@@ -24,6 +26,56 @@ namespace ReadHaven.Controllers
             return View();
         }
 
+        [HttpPost("SendOtp")]    
+        public async Task<IActionResult> SendOtp(string email)
+        {
+            if (IsValidEmail(email) == false)
+            {
+                return Ok(new { success = false, message = "Invalid email format." });
+            }
+            var random = new Random();
+            var generatedOtp = random.Next(100000, 999999).ToString();
+            var otpExpiry = DateTime.Now.AddMinutes(5);
+
+            var otpRequest = new OtpRequest
+            {
+                Email = email,
+                Otp = generatedOtp,
+                ExpiryTime = otpExpiry,
+                IsValidated = false
+            };
+
+            _context.OtpRequests.Add(otpRequest);
+            _context.SaveChanges();
+
+            string emailBody = $"Your OTP code is <b>{generatedOtp}</b>. It is valid for 5 minutes.";
+            await _emailSender.SendEmailAsync(email, "Your OTP Code", emailBody);
+
+            return Ok(new { success = true, message = "Email sent successfully." });
+        }
+
+        [HttpPost("VerifyOtp")]
+        public IActionResult VerifyOtp(String email,string otp)
+        {
+            var otpRequest = _context.OtpRequests
+             .Where(x => x.Email == email && x.Otp == otp)
+             .OrderByDescending(x => x.ExpiryTime)
+             .FirstOrDefault();
+
+            if (otpRequest != null)
+            {
+                otpRequest.IsValidated = true;
+                _context.OtpRequests.Update(otpRequest);
+                _context.SaveChanges();
+                return Ok(true);
+            }
+            else
+            {
+                return Ok(false);
+            }
+        }
+
+        /*
         [HttpGet("LoadPayment")]
         public IActionResult LoadPayment(Guid orderId)
         {
@@ -41,8 +93,19 @@ namespace ReadHaven.Controllers
                 };
                 return PartialView("_Payment", model);
             }
+        }*/
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new System.Net.Mail.MailAddress(email);
+                return mailAddress.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
-
-
     }
 }

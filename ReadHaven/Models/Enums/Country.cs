@@ -1,7 +1,7 @@
 ﻿namespace ReadHaven.Models.Enums
 {
-    public enum Currency
+    public enum Country
     {
-        USD
+        Bangladesh
     }
 }

@@ -1,0 +1,29 @@
+﻿.order-summary-item p {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.order-summary-footer p {
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+.shipping-payment-form .form-group {
+    margin-bottom: 15px;
+}
+
+#order-form button {
+    margin-top: 20px;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.order-summary, .shipping-payment-form {
+    margin-bottom: 20px;
+}
+
+    .order-summary .card-header, .shipping-payment-form .card-header {
+        font-size: 1.2em;
+    }

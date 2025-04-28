@@ -4,6 +4,7 @@ using ReadHaven.Models.Book;
 using ReadHaven.Helpers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ReadHaven.Models.User;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 namespace ReadHaven.Services
 {
@@ -30,6 +31,14 @@ namespace ReadHaven.Services
         public List<CartItem> GetCartItemsForUser(Guid userId)
         {
             return _context.CartItems.Where(c => c.UserId == userId).ToList();
+        }
+        public List<CartItem> GetOrderCartItemsForUser(Guid userId)
+        {
+            var cartItems = _context.CartItems
+                .Where(c => c.OrderId == Guid.Empty)
+                .ToList();
+
+            return cartItems;
         }
 
         public int GetCartItemCountForGuest()

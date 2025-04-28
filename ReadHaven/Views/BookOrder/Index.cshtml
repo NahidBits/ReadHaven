@@ -1,27 +1,150 @@
-﻿@{
-    ViewData["Title"] = "Book Order";
-}
+﻿<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Order Confirmation</h2>
 
-<div id="orderDetails">
-    <h4 class="mb-3">Your Orders</h4>
+    <!-- Order Summary Section -->
+    <div class="order-summary card shadow-sm mb-5">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h4 class="m-0">Order Details</h4>
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="card-body">
+            <!-- Total Order Information -->
+            <div class="order-summary-item mb-4">
+                <h5 class="text-muted">Total Quantity:</h5>
+                <p id="totalQuantity" class="fs-5 fw-bold text-dark">0</p>
+            </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="orderTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>Total Amount</th>
-                    <th>Order Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="orderTableBody">
-                <!-- Dynamic rows will be injected here -->
-            </tbody>
-        </table>
+            <div class="order-summary-item mb-4">
+                <h5 class="text-muted">Total Subtotal:</h5>
+                <p id="totalAmount" class="fs-5 fw-bold text-dark">$0.00</p>
+            </div>
+
+            <!-- Pricing Breakdown -->
+            <div class="order-summary-footer mb-4">
+                <h5 class="text-muted">Pricing Breakdown</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-2"><strong>Tax:</strong></p>
+                        <p id="taxAmount" class="text-success fs-6">$0.00</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-2"><strong>Discount:</strong></p>
+                        <p id="discountAmount" class="text-danger fs-6">0%</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <p class="mb-2"><strong>Total (tax & discount):</strong></p>
+                    </div>
+                    <div class="col-6">
+                        <p id="totalAmountAllCutting" class="fs-5 fw-bold text-dark">$0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping and Payment Form Section -->
+    <div class="shipping-payment-form card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h4>Shipping & Payment Information</h4>
+        </div>
+        <div class="card-body">
+            <form class="row g-3" id="order-form">
+                <!-- Shipping Address -->
+                <div class="col-md-6">
+                    <label for="shippingAddress" class="form-label">Shipping Address</label>
+                    <input type="text" class="form-control" id="shippingAddress" placeholder="Enter shipping address" required>
+                </div>
+
+                <!-- City -->
+                <div class="col-md-6">
+                    <label for="shippingCity" class="form-label">City</label>
+                    <select class="form-select" id="shippingCity" required>
+                        <option value="">Select City</option>
+                        @foreach (var method in Enum.GetValues(typeof(ReadHaven.Models.Enums.City)))
+                        {
+                            <option value="@( (int)method )">@method</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Postal Code -->
+                <div class="col-md-6">
+                    <label for="shippingPostalCode" class="form-label">Postal Code</label>
+                    <input type="text" class="form-control" id="shippingPostalCode" placeholder="Enter postal code" required>
+                </div>
+
+                <!-- Country -->
+                <div class="col-md-6">
+                    <label for="shippingCountry" class="form-label">Country</label>
+                    <select class="form-select" id="shippingCountry" required>
+                        <option value="">Select Country</option>
+                        @foreach (var country in Enum.GetValues(typeof(ReadHaven.Models.Enums.Country)))
+                        {
+                            <option value="@( (int)country )">@country</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Contact Number -->
+                <div class="col-md-6">
+                    <label for="contactNumber" class="form-label">Contact Number</label>
+                    <input type="text" class="form-control" id="contactNumber" placeholder="Enter your contact number" required>
+                </div>
+
+                <!-- Email Address -->
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email address" required>
+                </div>
+
+                <!-- Currency -->
+                <div class="col-md-6">
+                    <label for="currency" class="form-label">Currency</label>
+                    <select class="form-select" id="currency" required>
+                        <option value="">Select Currency</option>
+                        @foreach (var currency in Enum.GetValues(typeof(ReadHaven.Models.Enums.Currency)))
+                        {
+                            <option value="@( (int)currency )">@currency</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="col-md-6">
+                    <label for="paymentMethod" class="form-label">Payment Method</label>
+                    <select class="form-select" id="paymentMethod" required>
+                        <option value="">Select Payment Method</option>
+                        @foreach (var method in Enum.GetValues(typeof(ReadHaven.Models.Enums.PaymentMethod)))
+                        {
+                            <option value="@( (int)method )">@method</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- OTP Email -->
+                <div class="col-md-6" id="emailForm" style="display: none;">
+                    <label for="otpEmail" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="otpEmail" placeholder="Enter your email address" required>
+                    <button type="button" class="btn btn-link" id="sendOtp" onclick="sendOtpToEmail()">Send OTP</button>
+                </div>
+
+                <!-- OTP Form -->
+                <div class="col-md-6" id="otpForm" style="display: none;">
+                    <label for="otp" class="form-label">OTP</label>
+                    <input type="text" class="form-control" id="otp" placeholder="Enter OTP sent to your email" required>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12 mt-4">
+                    <button class="btn btn-primary btn-block"  onclick="completePayment()">Complete Payment</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div id="paymentSection" class="mt-4"></div>
-
 <script src="~/js/Order/Index.js"></script>
-
+<link href="~/css/Book/Index.css" rel="stylesheet" />
