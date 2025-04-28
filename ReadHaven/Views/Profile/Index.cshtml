@@ -2,84 +2,106 @@
     ViewData["Title"] = "Book Details";
 }
 
-<div class="container mt-4">
+<div class="container-fluid" style="display: flex; height: 100vh;">
+        <!-- Sidebar Toggle Button (OUTSIDE Sidebar) -->
+        <button id="sidebarToggle" class="btn btn-primary"
+            style="position: fixed; top: 80px; left: 1px; z-index: 1050; padding: 5px 8px; background-color: #B2BEB5; border: none; border-radius: 5px;">
+            ☰
+        </button>
 
-    <!-- Profile Section -->
-    <div id="profileSection" class="mb-4">
-        <p><strong>Name:</strong> <span id="profileName"></span></p>
-        <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-    </div>
-
-    <!-- My Orders Section -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white border-bottom-0">
-            <h5 class="mb-0">📦 My Orders</h5>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">🆔 Order ID</th>
-                        <th scope="col">📅 Date</th>
-                        <th scope="col">💰 Total</th>
-                        <th scope="col">📌 Status</th>
-                    </tr>
-                </thead>
-                <tbody id="myOrderTableBody">
-                    <!-- Orders will be injected here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    @if (User.IsInRole("Admin"))
-    {
-        <br />
-        <br />
-        <!-- Admin View of All User Orders -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0">
-                <h5 class="mb-0">📦 User Orders</h5>
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-dark text-white"
+             style="width: 250px; height: 100%; position: fixed; top: 0; left: 0; transform: translateX(-250px); transition: transform 0.3s ease;">
+            <div class="p-4">
+                <h4 class="text-center mb-4">Admin Panel</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item" onclick="showProfile()">Profile</li>
+                    <li class="nav-item" onclick="showMyOrder()">My Orders</li>
+                    <li class="nav-item" onclick="showUserOrder()">Orders</li>
+                    <li class="nav-item" onclick="showBookSales()">Book Sales</li>
+                </ul>
             </div>
-        <div class="table-responsive">
-                <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center" id="userOrderTable">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">🆔 Order ID</th>
-                        <th scope="col">📅 Date</th>
-                        <th scope="col">💰 Total</th>
-                        <th scope="col">📌 Status</th>
-                    </tr>
-                </thead>
-                <tbody id="userOrderTableBody">
-                    <!-- JS will render order rows here -->
-                </tbody>
-            </table>
         </div>
+    <!-- Main Content Area -->
+    <div class="main-content" style="margin-left: 0; padding: 20px; width: 100%; transition: margin-left 0.3s ease;">
+        <!-- Profile Section -->
+        <div id="profileSection" class="mb-4">
+            <p><strong>Name:</strong> <span id="profileName"></span></p>
+            <p><strong>Email:</strong> <span id="profileEmail"></span></p>
         </div>
 
-        <br />
-        <br />
-        <!-- Admin View of All Book Sales -->
-        <div class="card shadow-sm border-0">
+        <!-- My Orders Section -->
+        <div class="card shadow-sm border-0" style="display:none" id="myOrder">
             <div class="card-header bg-white border-bottom-0">
-                <h5 class="mb-0">📊 Book Sales Summary</h5>
+                <h5 class="mb-0">📦 My Orders</h5>
             </div>
             <div class="table-responsive">
-                <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center" id="userOrderTable">
+                <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center">
                     <thead class="table-dark">
                         <tr>
-                            <th>📘 Image</th>
-                            <th>📚 Title</th>
-                            <th>🔢 Quantity Sold</th>
+                            <th scope="col">🆔 Order ID</th>
+                            <th scope="col">📅 Date</th>
+                            <th scope="col">💰 Total</th>
+                            <th scope="col">📌 Status</th>
                         </tr>
                     </thead>
-                    <tbody id="salesTableBody">
-                        <!-- JS will render order rows here -->
+                    <tbody id="myOrderTableBody">
+                        <!-- Orders will be injected here -->
                     </tbody>
                 </table>
             </div>
         </div>
-    }
+
+        @if (User.IsInRole("Admin"))
+        {
+            <br />
+            <br />
+            <!-- Admin View of All User Orders -->
+            <div class="card shadow-sm border-0" style="display:none" id="userOrder">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0">📦 User Orders</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center" id="userOrderTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">🆔 Order ID</th>
+                                <th scope="col">📅 Date</th>
+                                <th scope="col">💰 Total</th>
+                                <th scope="col">📌 Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userOrderTableBody">
+                            <!-- JS will render order rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <br />
+            <br />
+            <!-- Admin View of All Book Sales -->
+            <div class="card shadow-sm border-0" style="display:none" id="bookSales">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0">📊 Book Sales Summary</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered align-middle table-striped bg-white text-center" id="userOrderTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>📘 Image</th>
+                                <th>📚 Title</th>
+                                <th>🔢 Quantity Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- JS will render order rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
 </div>
-    <script src="~/js/Profile/Index.js"></script>
+
+<script src="~/js/Profile/Index.js"></script>

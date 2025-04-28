@@ -7,6 +7,14 @@ const orderStatusCodeMap = {
     4: "Cancelled"
 };
 
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.querySelector('.main-content');
+const sidebarToggle = document.getElementById('sidebarToggle');
+let sidebarOpen = false;
+const userOrder = document.getElementById('userOrder');
+const myOrder = document.getElementById('myOrder');
+const bookSales = document.getElementById('bookSales');
+
 // Then map status string to badge HTML
 const orderStatusBadgeMap = {
     "Pending": '<span class="badge bg-warning text-dark">Pending</span>',
@@ -172,7 +180,39 @@ function changeOrderStatus(orderId, newStatus, event) {
     });
 }
 
+function showMyOrder() {
+    userOrder.style.display = 'none';
+    myOrder.style.display = 'block';
+    bookSales.style.display = 'none';
+    loadMyOrderData();
+}
 
+function showUserOrder() {
+    userOrder.style.display = 'block';
+    myOrder.style.display = 'none';
+    bookSales.style.display = 'none';
+    loadUserOrderData();
+}
+function showBookSales() {
+    userOrder.style.display = 'none';
+    myOrder.style.display = 'none';
+    bookSales.style.display = 'block';
+    loadBookSalesData();
+}
+
+sidebarToggle.addEventListener('click', function () {
+    if (sidebarOpen) {
+        sidebar.style.transform = 'translateX(-250px)';
+        mainContent.style.marginLeft = '0';
+        sidebarToggle.style.left = '20px'; 
+        sidebarOpen = false;
+    } else {
+        sidebar.style.transform = 'translateX(0px)';
+        mainContent.style.marginLeft = '250px';
+        sidebarToggle.style.left = '270px'; 
+        sidebarOpen = true;
+    }
+});
 
 window.onload = function () {
     loadProfileData();
