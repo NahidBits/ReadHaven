@@ -6,6 +6,7 @@ using System;
 using ReadHaven.ViewModels;
 using Payment.Models;
 using ReadHaven.Models;
+using ReadHaven.Models.Order;
 
 namespace ReadHaven.Controllers
 {
@@ -55,24 +56,40 @@ namespace ReadHaven.Controllers
         }
 
         [HttpPost("VerifyOtp")]
-        public IActionResult VerifyOtp(String email,string otp)
+        public IActionResult VerifyOtp([FromBody] PaymentViewModel payment)
         {
             var otpRequest = _context.OtpRequests
-             .Where(x => x.Email == email && x.Otp == otp)
+             .Where(x => x.Email == payment.Email && x.Otp == payment.Otp)
              .OrderByDescending(x => x.ExpiryTime)
              .FirstOrDefault();
 
-            if (otpRequest != null)
-            {
-                otpRequest.IsValidated = true;
-                _context.OtpRequests.Update(otpRequest);
-                _context.SaveChanges();
-                return Ok(true);
-            }
-            else
-            {
+            var cartItems = _context.CartItems.Where(c => c.UserId == UserId).ToList();
+            if (!cartItems.Any() || otpRequest == null)
                 return Ok(false);
+
+            otpRequest.IsValidated = true;
+            _context.OtpRequests.Update(otpRequest);
+
+            foreach (var item in cartItems)
+            {
+                item.OrderId = payment.OrderId;
+                item.IsDeleted = true;
             }
+
+            _context.CartItems.UpdateRange(cartItems);
+
+            var newPayment = new PaymentTransaction
+            {
+                OrderId = payment.OrderId,
+                TotalAmount = payment.TotalAmount,
+                Currency = payment.Currency,
+                PaymentMethod = payment.PaymentMethod,
+                Status = Status.Success
+            };
+
+            _context.PaymentTransactions.Add(newPayment);
+            _context.SaveChanges();
+            return Ok(true);
         }
         private bool IsValidEmail(string email)
         {

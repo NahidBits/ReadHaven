@@ -159,32 +159,7 @@ namespace ReadHaven.Controllers
 
             _context.Orders.Add(newOrder);
             _context.SaveChanges();
-
-            var cartItems = _context.CartItems.Where(c => c.UserId == UserId).ToList();
-
-            if (!cartItems.Any())
-                return Ok(new { success = false });
-
-            foreach (var item in cartItems)
-            {
-                item.OrderId = newOrder.Id;
-                item.IsDeleted = true;
-            }
-
-            _context.CartItems.UpdateRange(cartItems);
-
-            var payment = new PaymentTransaction
-            {
-                OrderId = newOrder.Id,
-                TotalAmount = order.Amount,
-                Currency = order.Currency,
-                PaymentMethod = order.PaymentMethod,
-                Status = Status.Success
-            };  
-
-            _context.PaymentTransactions.Add(payment);
-            _context.SaveChanges();
-            return Ok(new { success = true});
+            return Ok(new { success = true,orderId = newOrder.Id});
         }
     }
 }

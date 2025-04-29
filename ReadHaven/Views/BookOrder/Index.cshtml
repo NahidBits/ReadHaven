@@ -51,7 +51,7 @@
             <h4>Shipping & Payment Information</h4>
         </div>
         <div class="card-body">
-            <form class="row g-3" id="order-form">
+            <div class="row g-3" id="personalInfoForm">
                 <!-- Shipping Address -->
                 <div class="col-md-6">
                     <label for="shippingAddress" class="form-label">Shipping Address</label>
@@ -100,6 +100,15 @@
                     <input type="email" class="form-control" id="email" placeholder="Enter your email address" required>
                 </div>
 
+                <!-- Submit Button -->
+                <div class="col-12 mt-4">
+                    <button class="btn btn-primary btn-block" onclick="submitShippingAddress()">Next</button>
+                </div>
+            </div>
+
+            <div class="row g-3" id="paymentInfoForm">
+
+                <input type="hidden" class="form-control" id="orderId">
                 <!-- Currency -->
                 <div class="col-md-6">
                     <label for="currency" class="form-label">Currency</label>
@@ -139,9 +148,9 @@
 
                 <!-- Submit Button -->
                 <div class="col-12 mt-4">
-                    <button class="btn btn-primary btn-block"  onclick="completePayment()">Complete Payment</button>
+                    <button class="btn btn-primary btn-block" onclick="submitPayment()">Complete Payment</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

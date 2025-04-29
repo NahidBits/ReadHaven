@@ -2,10 +2,16 @@
 const emailForm = document.getElementById('emailForm');
 const otpForm = document.getElementById('otpForm');
 const sendOtpButton = document.getElementById('sendOtp');
-//const completePaymentButton = document.getElementById('completePayment');
 const emailInput = document.getElementById('otpEmail');
 const otpInput = document.getElementById('otp');
-
+const personalInfoForm = document.getElementById('personalInfoForm');
+const paymentInfoForm = document.getElementById('paymentInfoForm');
+const shippingAddress = document.getElementById("shippingAddress");
+const shippingCity = document.getElementById("shippingCity");
+const shippingPostalCode = document.getElementById("shippingPostalCode");
+const shippingContact = document.getElementById("contactNumber");
+const shippingCountry = document.getElementById("shippingCountry");
+const email = document.getElementById("email");
 function loadProductDetails() {
     $.ajax({
         url: '/BookOrder/UserProductDetails',
@@ -26,37 +32,30 @@ function loadProductDetails() {
     });
 }
 
-function orderForm() {
-    var shippingAddress = document.getElementById("shippingAddress").value;
-    var shippingCity = parseInt(document.getElementById("shippingCity").value);
-    var shippingPostalCode = document.getElementById("shippingPostalCode").value;
-    var shippingContact = document.getElementById("contactNumber").value;
-    var shippingCountry = document.getElementById("shippingCountry").value;
-    var email = document.getElementById("email").value;
-    var currency = parseInt(document.getElementById("currency").value);
-    var paymentMethod = parseInt(document.getElementById("paymentMethod").value);
-    var amount = parseFloat(document.getElementById("totalAmountAllCutting").textContent);
+function submitShippingAddress() {
+    
 
     var order = {
-        ShippingAddress: shippingAddress,
-        ShippingCity: shippingCity,
-        ShippingContact: shippingContact,
-        Email: email,
-        PaymentMethod: paymentMethod,
-        Amount: amount,
-        Currency: currency,
-        ShippingPostalCode: shippingPostalCode,
-        ShippingCountry: shippingCountry
+        ShippingAddress: shippingAddress.value,
+        ShippingCity: parseInt(shippingCity.value),
+        ShippingContact: shippingContact.value,
+        Email: email.value,
+        ShippingPostalCode: shippingPostalCode.value,
+        ShippingCountry: parseInt(shippingCountry.value)
     };
 
     $.ajax({
         url: '/BookOrder/ConfirmOrder',
         type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(order),
+        contentType: 'application/json', 
+        data: JSON.stringify(order), 
         success: function (response) {
             if (response.success) {
-                window.location.href = "/Book";
+                personalInfoForm.style.display = 'none';
+                paymentInfoForm.style.display = 'block';
+                document.getElementById("orderId").value = response.orderId;
+                showToastMessage('Shipping address Submitted.', 'success', 3000);
+
             } else {
                 showToastMessage('Error confirming order. Please try again.', 'danger', 3000);
             }
@@ -105,100 +104,53 @@ function sendOtpToEmail() {
         }
     });
 }
-
-
-function completePayment() {
-    verifyOtpAsync()
-        .then(isValid => {
-            if (isValid) {
-                confirmOrder();
-            } else {
-                console.log('Invalid OTP');
-            }
-        })
-        .catch(error => {
-            console.error('Error during OTP verification:', error);
-            showToastMessage('Error verifying OTP. Please try again later.', 'danger', 3000);
-        });
-}
-
-function verifyOtpAsync() {
-    const otp = otpInput.value;
-    const email = emailInput.value;
+function submitPayment() {
+    var otp = otpInput.value;
+    var email = emailInput.value;
+    var orderId = document.getElementById("orderId").value;  
+    var currency = parseInt(document.getElementById("currency").value);
+    var paymentMethod = parseInt(document.getElementById("paymentMethod").value);
+    var amount = parseFloat(document.getElementById("totalAmountAllCutting").textContent);
 
     if (!otp) {
         showToastMessage('Please enter your OTP.', 'warning', 3000);
         return Promise.resolve(false);
     }
 
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: '/Payment/VerifyOtp',
-            type: 'POST',
-            data: { email: email, otp: otp },
-            success: function (response) {
-                if (response) {
-                    resolve(true);
-                } else {
-                    showToastMessage('Invalid OTP. Please try again.', 'danger', 3000);
-                    resolve(false);
-                }
-            },
-            error: function (error) {
-                console.error('Error during OTP verification:', error);
-                showToastMessage('Error during OTP verification. Please try again later.', 'danger', 3000);
-                reject(error);
-            }
-        });
-    });
-}
-
-function confirmOrder() {
-    var shippingAddress = document.getElementById("shippingAddress").value;
-    var shippingCity = parseInt(document.getElementById("shippingCity").value) || 0;
-    var shippingPostalCode = document.getElementById("shippingPostalCode").value;
-    var shippingContact = document.getElementById("contactNumber").value;
-    var shippingCountry = parseInt(document.getElementById("shippingCountry").value) || 0;
-    var emailAddress = document.getElementById("email").value;
-    var currency = parseInt(document.getElementById("currency").value) || 0;
-    var paymentMethod = parseInt(document.getElementById("paymentMethod").value) || 0;
-    var amount = parseFloat(document.getElementById("totalAmountAllCutting").textContent) || 0;
-
-    var order = {
-        ShippingAddress: shippingAddress,
-        ShippingCity: shippingCity,
-        ShippingContact: shippingContact,
-        Email: emailAddress,
-        PaymentMethod: paymentMethod,
-        Amount: amount,
+    var payment = {
+        Otp: otp,
+        Email: email,
+        OrderId: orderId,
+        Email: email,
         Currency: currency,
-        ShippingPostalCode: shippingPostalCode,
-        ShippingCountry: shippingCountry
+        PaymentMethod: paymentMethod,
+        Amount: amount
     };
 
     $.ajax({
-        url: '/BookOrder/ConfirmOrder',
+        url: '/Payment/VerifyOtp',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(order),
+        data: JSON.stringify(payment),
         success: function (response) {
-            if (response.success) {
+            if (response) {
+                showToastMessage('OTP verified successfully and Payment is Successed!', 'success', 50000);
                 setTimeout(function () {
                     window.location.assign("/Book");
-                }, 200);  // small delay to avoid sudden transition
+                }, 5000);
             } else {
-                showToastMessage('Error confirming order. Please try again.', 'danger', 3000);
+                showToastMessage(response.message || 'OTP verification failed.', 'danger', 3000);
             }
         },
-        error: function (xhr, status, error) {
-            console.error('Order confirmation failed:', error);
-            showToastMessage('Order failed: ' + (xhr.responseText || 'Please try again later.'), 'danger', 3000);
+        error: function (error) {
+            console.error('Error during OTP verification:', error);
+            showToastMessage('Error during OTP verification. Please try again later.', 'danger', 3000);
         }
     });
 }
 
-
 window.onload = function () {
     loadProductDetails();
     loadFormSubmit();
+    paymentInfoForm.style.display = 'none';
 };
