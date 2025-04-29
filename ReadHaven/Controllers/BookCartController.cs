@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.Cart;
 using ReadHaven.Services;
 using ReadHaven.ViewModels;
@@ -116,5 +117,17 @@ namespace ReadHaven.Controllers
 
             return Ok(new { success = true, message = "Cart item removed." });
         }
+
+        [HttpGet("IsPurchasedBook")]
+        public IActionResult IsPurchasedBook(Guid bookId)
+        {
+            var purchased = _context.CartItems
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Any(c => c.BookId == bookId && c.UserId == UserId && c.IsDeleted == true);
+
+            return Ok(purchased);
+        }
+
     }
 }

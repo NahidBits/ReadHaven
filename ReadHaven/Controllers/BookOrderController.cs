@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ReadHaven.Models.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReadHaven.Controllers
 {
@@ -24,12 +25,17 @@ namespace ReadHaven.Controllers
             _context = context;
             _cartService = cartService;
         }
+        
 
         [HttpGet("Index")]
         public IActionResult Index()
         {
-        //    PlaceOrder(UserId);
-            return View();
+           var hasCartItems = _context.CartItems.Any(c => c.UserId == UserId && !c.IsDeleted);
+           if (!hasCartItems)
+           {
+              return RedirectToAction("Index", "Book");
+           }
+           return View();
         }
 
         [HttpGet("UserProductDetails")]

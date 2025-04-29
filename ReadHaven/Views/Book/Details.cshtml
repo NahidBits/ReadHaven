@@ -68,8 +68,6 @@
 
         <!-- Review Form Section (Right) -->
         <div id="reviewFormSection" class="p-3 rounded shadow-sm bg-light" style="max-width: 350px;">
-            @if (User.Identity.IsAuthenticated)
-            {
                 <form id="reviewForm" onsubmit="submitReview(event)" class="border rounded p-3 bg-white shadow-sm">
                     <div class="mb-2">
                         <select name="Rating" id="ratingSelect" class="form-select form-select-sm" required>
@@ -93,16 +91,11 @@
                         </button>
                     </div>
                 </form>
-            }
-            else
-            {
-                <div class="bg-white px-2 py-1 rounded shadow-sm d-flex align-items-center gap-1 border small" style="max-width: fit-content;">
-                    <a href="/Auth/Login" title="Login" class="d-flex align-items-center gap-2">
-                        <i class="bi bi-info-circle text-muted" style="font-size: 0.9rem;"></i>
-                        <span class="text-muted" style="font-size: 0.8rem;">Login to review</span>
-                    </a>
-                </div>
-            }
+            <div class="bg-white px-2 py-1 rounded shadow-sm d-flex align-items-center gap-1 border small" style="max-width: fit-content;" id="writeReviewButton">
+                   <button class="btn btn-sm review-button" onclick="writeReview()" id="writeReview">
+                        Write a Review
+                    </button>
+            </div>
         </div>
     </div>
 

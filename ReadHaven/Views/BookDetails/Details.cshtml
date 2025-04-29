@@ -81,18 +81,9 @@
 
     <!-- Review Submission Section -->
     <div id="review-section">
-        @if (!User.Identity.IsAuthenticated)
-        {
-            <div class="text-center">
-                <p class="text-muted">Please <a href="/Account/Login">log in</a> to write a review.</p>
-            </div>
-        }
-        else
-        {
-            <div id="userReviewContainer">
-                <div class="text-center text-muted">Loading your review...</div>
-            </div>
-        }
+        <button class="btn btn-secondary btn-lg review-button">
+            Write a Review
+        </button>
     </div>
 </div>
 
