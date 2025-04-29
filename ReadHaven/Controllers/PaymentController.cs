@@ -74,27 +74,6 @@ namespace ReadHaven.Controllers
                 return Ok(false);
             }
         }
-
-        /*
-        [HttpGet("LoadPayment")]
-        public IActionResult LoadPayment(Guid orderId)
-        {
-            var order = _context.Orders.Find(orderId);
-
-            if (order == null || order.Status != OrderStatus.Pending)
-            {
-                return NotFound();
-            }else
-            {
-                var model = new OrderViewModel
-                {
-                    Id = order.Id,
-                    Amount = order.TotalAmount
-                };
-                return PartialView("_Payment", model);
-            }
-        }*/
-
         private bool IsValidEmail(string email)
         {
             try
