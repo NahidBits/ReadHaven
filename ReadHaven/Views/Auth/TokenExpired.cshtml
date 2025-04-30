@@ -2,11 +2,27 @@
     ViewData["Title"] = "Token Expired";
 }
 
-<h2>Token Expired</h2>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body p-5 text-center">
+                <h3 class="text-danger mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Token Expired
+                </h3>
+                <p class="text-muted mb-3">
+                    Your password reset token is either expired or invalid.
+                </p>
+                <p class="mb-4">Please request a new password reset link to continue.</p>
 
-<p>Your password reset token has either expired or is invalid. Please request a new password reset link.</p>
-
-<p><a href="@Url.Action("ForgotPassword", "Auth")">Click here to request a new password reset link.</a></p>
-
-<!-- Optionally, provide a button to go back to the login page -->
-<p><a href="@Url.Action("Index", "Auth")">Back to Login</a></p>
+                <div class="d-grid gap-3">
+                    <a href="@Url.Action("ForgotPassword", "Auth")" class="btn btn-outline-secondary shadow-sm">
+                        <i class="bi bi-envelope-fill me-1"></i> Request New Link
+                    </a>
+                    <a href="@Url.Action("Index", "Auth")" class="btn btn-dark shadow-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Back to Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
