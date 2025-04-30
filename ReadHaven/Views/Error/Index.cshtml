@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "Error"; 
+}
+
+<style>
+    .not-found-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+    }
+
+    .not-found-box {
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+        .not-found-box img {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .not-found-box h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .not-found-box p {
+            color: #6c757d;
+        }
+
+        .not-found-box .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+</style>
+
+<div class="not-found-page">
+    <div class="text-center not-found-box">
+        <img src="~/uploads/logo/logo.png" alt="Logo" />
+        <h2 class="text-danger">Oops! Page Not Found</h2>
+        <p class="lead">The page you're looking for doesn't exist or may have been moved.</p>
+        <a href="/" class="btn btn-primary">Go Back to Home</a>
+    </div>
+</div>

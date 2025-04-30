@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ReadHaven.Services;
 using System.Security.Claims;
 
 namespace ReadHaven.Controllers
@@ -25,5 +26,19 @@ namespace ReadHaven.Controllers
         }
 
         protected bool IsAuthenticated => User.Identity?.IsAuthenticated ?? false;
+
+        protected bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new System.Net.Mail.MailAddress(email);
+                return mailAddress.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
     }
 }

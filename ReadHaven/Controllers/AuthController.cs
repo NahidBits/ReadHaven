@@ -211,8 +211,7 @@ namespace ReadHaven.Controllers
 
         [HttpGet("TokenExpired")]
         public IActionResult TokenExpired() => View();
-
-        private void MergeGuestSessionToUser(Guid userId)
+        protected void MergeGuestSessionToUser(Guid userId)
         {
             var guestCart = _cartService.GetCartItemsForGuest();
             foreach (var item in guestCart)
@@ -222,18 +221,6 @@ namespace ReadHaven.Controllers
             }
 
             _cartService.ClearAllGuestCart();
-        }
-        private bool IsValidEmail(string email)
-        {
-            try
-            {
-                var mailAddress = new System.Net.Mail.MailAddress(email);
-                return mailAddress.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

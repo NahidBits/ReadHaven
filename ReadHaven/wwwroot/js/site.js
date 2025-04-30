@@ -38,28 +38,39 @@ function formatDate(dateString) {
 }
 
 // ✅ Global Toast Notification
-function showToastMessage(message, type = "success", delay = 2000) {
-    const toastEl = document.getElementById("globalToast");
-    const toastBody = document.getElementById("globalToastBody");
+function showToastMessage(message, type = "success") {
+    const config = {
+        success: { bg: "bg-success", icon: "bi-check-circle-fill", text: "text-white" },
+        error: { bg: "bg-danger", icon: "bi-exclamation-triangle-fill", text: "text-white" },
+        warning: { bg: "bg-warning", icon: "bi-exclamation-circle-fill", text: "text-dark" },
+        info: { bg: "bg-info", icon: "bi-info-circle-fill", text: "text-dark" }
+    };
 
-    if (!toastEl || !toastBody) {
-        console.warn("Toast elements not found in DOM.");
-        return;
-    }
+    const toastType = config[type] || config.success;
 
-    toastBody.textContent = message;
+    const toast = document.createElement("div");
+    toast.className = `toast align-items-center ${toastType.bg} ${toastType.text} border-0 position-fixed bottom-0 end-0 m-3 shadow`;
+    toast.role = "alert";
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
 
-    toastEl.className = "toast align-items-center text-white border-0 show";
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="bi ${toastType.icon} fs-5"></i>
+                <span>${message}</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
 
-    toastEl.classList.add({
-        success: "bg-success",
-        error: "bg-danger",
-        info: "bg-info",
-        warning: "bg-warning"
-    }[type] || "bg-success");
+    document.body.appendChild(toast);
 
-    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: delay });
-    toast.show();
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+
+    // Clean up after showing
+    setTimeout(() => toast.remove(), 3500);
 }
 
 // ✅ Save scroll position before navigating away

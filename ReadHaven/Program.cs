@@ -31,10 +31,11 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Book/Error");
+    app.UseExceptionHandler("/Error/NotFound");
     app.UseHsts();
 }
-
+app.UseExceptionHandler("/Error/NotFound"); 
+app.UseStatusCodePagesWithReExecute("/Error/NotFound");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

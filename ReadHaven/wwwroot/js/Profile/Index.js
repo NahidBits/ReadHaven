@@ -187,13 +187,9 @@ sidebarToggle.addEventListener('click', () => {
     sidebarOpen = !sidebarOpen;
 });
 
-// Helper function to format date (assume you have a formatDate somewhere)
-function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString();
-}
 
 // When page loads
 window.onload = function () {
+    updateCartCountBadge();
     loadMyOrderSection();
 };

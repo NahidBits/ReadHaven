@@ -143,6 +143,11 @@
         cursor: not-allowed;
     }
 
+.transition {
+    transition: all 0.2s ease;
+}
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

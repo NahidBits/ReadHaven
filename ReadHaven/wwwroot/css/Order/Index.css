@@ -1,29 +1,93 @@
-﻿.order-summary-item p {
-    font-size: 1.1em;
-    margin-bottom: 5px;
+﻿/* General Container */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
 }
 
+/* Section Cards */
+.order-summary, .shipping-payment-form {
+    margin-bottom: 30px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    /* Card Headers */
+    .order-summary .card-header,
+    .shipping-payment-form .card-header {
+        font-size: 1.3rem;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+
+/* Summary Items */
+.order-summary-item p,
 .order-summary-footer p {
-    margin: 10px 0;
-    font-size: 1.1em;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
 }
 
-.shipping-payment-form .form-group {
-    margin-bottom: 15px;
+/* Pricing Breakdown */
+.order-summary-footer {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
 }
 
-#order-form button {
+/* Highlight Totals */
+#totalAmountAllCutting {
+    color: #0d6efd;
+}
+
+#taxAmount {
+    color: #198754;
+}
+
+#discountAmount {
+    color: #dc3545;
+}
+
+/* Form Groups */
+.shipping-payment-form .form-label {
+    font-weight: 500;
+}
+
+.shipping-payment-form input,
+.shipping-payment-form select {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.btn-link {
+    padding: 0;
+    font-size: 0.95rem;
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+/* Hidden Sections */
+#paymentInfoForm,
+#emailForm,
+#otpForm {
     margin-top: 20px;
 }
 
-.container {
-    max-width: 800px;
-}
-
-.order-summary, .shipping-payment-form {
-    margin-bottom: 20px;
-}
-
-    .order-summary .card-header, .shipping-payment-form .card-header {
-        font-size: 1.2em;
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+    .order-summary .card-header,
+    .shipping-payment-form .card-header {
+        font-size: 1.1rem;
     }
+
+    .btn-primary {
+        font-size: 1rem;
+    }
+}

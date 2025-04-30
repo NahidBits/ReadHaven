@@ -57,7 +57,7 @@ function submitShippingAddress() {
                 showToastMessage('Shipping address Submitted.', 'success', 3000);
 
             } else {
-                showToastMessage('Error confirming order. Please try again.', 'danger', 3000);
+                showToastMessage(response.message, 'danger', 3000);
             }
         },
         error: function (error) {

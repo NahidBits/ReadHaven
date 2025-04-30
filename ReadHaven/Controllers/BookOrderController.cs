@@ -25,7 +25,6 @@ namespace ReadHaven.Controllers
             _context = context;
             _cartService = cartService;
         }
-        
 
         [HttpGet("Index")]
         public IActionResult Index()
@@ -143,8 +142,14 @@ namespace ReadHaven.Controllers
         }
 
         [HttpPost("ConfirmOrder")]
-        public IActionResult ConfirmOrder([FromBody] OrderViewModel order)
+        public IActionResult 
+        ConfirmOrder([FromBody] OrderViewModel order)
         {
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(order.Email) || !IsValidEmail(order.Email))
+            {
+                return Ok(new { success = false, message = "Invalid input. Please check the form and try again." });
+            }
+
             var newOrder = new Order
             {
                 UserId = UserId,
