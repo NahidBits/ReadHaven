@@ -42,22 +42,32 @@ namespace ReadHaven.Controllers
 
             var books = _context.Books
                 .Where(b => bookIds.Contains(b.Id))
-                .ToDictionary(b => b.Id, b => b.Title);
+                .ToDictionary(b => b.Id, b => new { b.Title, b.ImagePath });
 
             var cartItemView = cartItems
                 .Where(c => !IsAuthenticated || c.UserId == UserId)
-                .Select(c => new CartItemViewModel
+                .Select(c =>
                 {
-                    Id = c.Id,
-                    BookId = c.BookId,
-                    BookTitle = books.ContainsKey(c.BookId) ? books[c.BookId] : "Unknown",
-                    Quantity = c.Quantity,
-                    UnitPrice = c.Price
+                    books.TryGetValue(c.BookId, out var bookInfo);
+                    return new CartItemViewModel
+                    {
+                        Id = c.Id,
+                        BookId = c.BookId,
+                        BookTitle = bookInfo?.Title ?? "Unknown",
+                        // Replace null ImagePath with default image path
+                        ImagePath = !string.IsNullOrEmpty(bookInfo?.ImagePath)
+                                    ? bookInfo.ImagePath
+                                    : "/uploads/book/Default_image.webp", 
+                        Quantity = c.Quantity,
+                        UnitPrice = c.Price
+                    };
                 })
                 .ToList();
 
             return Ok(cartItemView);
         }
+
+
 
         [HttpPost("AddToCart")]
         public async Task<IActionResult> AddToCart(Guid bookId)

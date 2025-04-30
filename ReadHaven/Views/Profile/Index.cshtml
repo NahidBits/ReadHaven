@@ -2,16 +2,16 @@
     ViewData["Title"] = "Profile Page";
 }
 
-<div class="container-fluid" style="display: flex; height: 100vh;">
+<div class="container-fluid" style="height: 100vh; overflow: hidden;">
     <!-- Sidebar Toggle Button -->
-    <button id="sidebarToggle" class="btn btn-primary"
-    style="position: fixed; top: 80px; left: 1px; z-index: 1050; padding: 5px 8px; background-color: #B2BEB5; border: none; border-radius: 5px;">
-        ☰
+    <button id="sidebarToggle" class="btn p-1 position-fixed shadow-sm"
+            style="top: 60px; left: 10px; z-index: 1050; border: none; border-radius: 0.4rem; background-color: transparent;">
+        <i class="bi bi-list fs-5 text-dark"></i>
     </button>
 
     <!-- Sidebar -->
     <div id="sidebar" class="bg-dark text-white"
-         style="width: 250px; height: 100vh; position: fixed; top: 0; left: 0; transform: translateX(-250px); transition: transform 0.3s ease;">
+         style="width: 200px; height: 100vh; position: fixed; top: 0; left: 0; transform: translateX(-250px); transition: transform 0.3s ease;">
         <div class="d-flex flex-column p-4 h-100">
             <h4 class="text-center mb-4">
                 @(User.IsInRole("Admin") ? "Admin Panel" : "User Panel")
@@ -46,8 +46,9 @@
             <hr class="border-light mt-auto" />
         </div>
     </div>
+
     <!-- Main Content -->
-    <div class="main-content" style="margin-left: 0; padding: 20px; width: 100%; transition: margin-left 0.3s ease;">
+    <div class="main-content" style="margin-left: 0; padding: 20px; width: 100%; transition: margin-left 0.3s ease; min-height: 100vh; padding-bottom: 60px;">
         <div id="mainContentArea">
             <!-- Sections will be loaded dynamically here -->
         </div>

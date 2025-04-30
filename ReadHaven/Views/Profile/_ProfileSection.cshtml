@@ -1,5 +1,18 @@
-﻿@* _ProfileSection.cshtml *@
-<div id="profileSection" class="mb-4">
-    <p><strong>Name:</strong> <span id="profileName"></span></p>
-    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+﻿<div id="profileSection" class="mb-4 text-center">
+    <!-- Profile Image -->
+    <div class="mb-3">
+        <img src="~/uploads/logo/Profile.jpg" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+    </div>
+
+    <!-- Profile Information -->
+    <div>
+        <p class="mb-2"><strong>Name:</strong> <span id="profileName">John Doe</span></p>
+        <p class="mb-2"><strong>Email:</strong> <span id="profileEmail">johndoe@example.com</span></p>
+    </div>
+
+    <!-- Edit Profile Button -->
+    <div>
+        <button class="btn btn-primary mt-3" onclick="editProfile()">Edit Profile</button>
+    </div>
 </div>
+
