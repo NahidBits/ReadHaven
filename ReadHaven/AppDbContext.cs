@@ -4,7 +4,7 @@ using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;
 using ReadHaven.Models.Cart;
 using ReadHaven.Models.Order;
-using Payment.Models;
+using ReadHaven.Models.Payment;
 using ReadHaven.Models;
 
 

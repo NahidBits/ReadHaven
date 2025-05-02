@@ -1,6 +1,6 @@
 ﻿using ReadHaven.Models.Common;
 
-namespace Payment.Models
+namespace ReadHaven.Models.Payment
 {
     public class OtpRequest : BaseEntity
     {

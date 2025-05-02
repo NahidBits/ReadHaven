@@ -85,6 +85,9 @@ namespace ReadHaven.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(!IsValidEmail(user.Email))
+                    return View();
+
                 var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
                 if (findUser != null || user.PasswordHash != confirmPassword) return View();
 

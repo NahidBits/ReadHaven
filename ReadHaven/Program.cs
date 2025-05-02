@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using ReadHaven;
 using ReadHaven.Services;
+using jsreport.AspNetCore;
+using jsreport.Local;
+using jsreport.Binary;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true;
     });
+
+
+builder.Services.AddJsReport(new LocalReporting()
+    .UseBinary(JsReportBinary.GetBinary())
+    .KillRunningJsReportProcesses()
+    .Configure(cfg => cfg.BaseUrlAsWorkingDirectory())
+    .AsUtility()
+    .Create());
 
 builder.Services.AddSession();
 builder.Services.AddTransient<IEmailSender, EmailSender>();

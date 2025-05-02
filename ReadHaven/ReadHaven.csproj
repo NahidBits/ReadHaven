@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="jsreport.AspNetCore" Version="3.8.1" />
+    <PackageReference Include="jsreport.Binary" Version="4.4.0" />
+    <PackageReference Include="jsreport.Local" Version="3.8.2" />
+    <PackageReference Include="MailKit" Version="4.12.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
@@ -21,6 +25,13 @@
     <Folder Include="wwwroot\css\Auth\" />
     <Folder Include="wwwroot\css\BookCart\" />
     <Folder Include="wwwroot\js\Shared\" />
+  </ItemGroup>
+
+  <!-- ✅ Include Razor Views in Output -->
+  <ItemGroup>
+    <Content Update="Views\**\*.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

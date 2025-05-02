@@ -134,10 +134,10 @@ function submitPayment() {
         data: JSON.stringify(payment),
         success: function (response) {
             if (response) {
-                showToastMessage('OTP verified successfully and Payment is Successed!', 'success', 50000);
+                showToastMessage('OTP verified successfully and Payment is Successed!', 'success', 20000);
                 setTimeout(function () {
                     window.location.assign("/Book");
-                }, 5000);
+                }, 3000);
             } else {
                 showToastMessage(response.message || 'OTP verification failed.', 'danger', 3000);
             }
