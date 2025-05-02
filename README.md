@@ -47,28 +47,45 @@
 
 ReadHaven/
 ├── Controllers/
-│ ├── AuthController.cs
-│ ├── BookController.cs
-│ ├── BookDetailsController.cs
-│ └── BookOrderController.cs
+│   ├── AuthController.cs               # Handles registration, login, password reset
+│   ├── BookController.cs               # Admin & user access to book listing, creation, update
+│   ├── BookDetailsController.cs        # Handles book details, reviews (CRUD), and ratings
+│   ├── BookOrderController.cs          # Order placement, viewing orders, status changes
+│   └── BaseController.cs               # Shared user/role access logic
+│
 ├── Models/
-│ ├── Book.cs
-│ ├── Review.cs
-│ ├── CartItem.cs
-│ └── Order.cs
+│   ├── Book.cs                         # Book data model
+│   ├── Review.cs                       # Review model linked to Book & User
+│   ├── CartItem.cs                     # Temporary or persistent cart storage
+│   ├── Order.cs                        # Order and order item models
+│   └── OTPVerification.cs             # OTP for secure actions like reset
+│
 ├── Services/
-│ ├── BookService.cs
-│ └── OTPService.cs
+│   ├── BookService.cs                  # Handles book-related business logic & image uploads
+│   ├── OTPService.cs                   # OTP generation, sending, validation
+│   ├── OrderService.cs                 # Order and cart-related logic
+│   └── EmailService.cs                 # Email configuration and sending
+│
+├── Repositories/
+│   └── GenericRepository.cs            # Reusable CRUD operations
+│
+├── Utilities/
+│   └── SessionCartHelper.cs           # Merges guest and user cart sessions
+│
 ├── Views/
-│ ├── Book/
-│ ├── BookDetails/
-│ ├── Order/
-│ └── Auth/
+│   ├── Shared/                         # Layouts, partials
+│   ├── Book/                           # Book listing and management
+│   ├── BookDetails/                    # Reviews, ratings, inline updates
+│   ├── Order/                          # Cart, order placement, order history
+│   └── Auth/                           # Login, registration, password reset
+│
 ├── wwwroot/
-│ ├── css/
-│ ├── js/
-│ └── images/
-└── appsettings.json
+│   ├── css/                            # Bootstrap and custom styles
+│   ├── js/                             # Site-wide and page-specific JS (e.g., Details.js)
+│   └── images/                         # Book cover uploads and other static assets
+│
+├── appsettings.json                    # Configuration (DB, email, etc.)
+└── Program.cs / Startup.cs             # ASP.NET Core setup and service registrations
 
 
 ---
