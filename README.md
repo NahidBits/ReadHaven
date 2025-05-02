@@ -4,7 +4,17 @@
 
 ---
 
-## 🌟 Features
+## ⚙️ Getting Started
+
+### 1. Clone the Repository
+
+git clone https://github.com/NahidBits/ReadHaven.git
+
+
+### 🚀 Live Demo
+
+🔗 [View Live Demo](http://172.16.227.82/)
+
 
 ### 👤 User Features
 - ✅ Register, login, and logout securely
@@ -87,18 +97,3 @@ ReadHaven/
 │
 ├── appsettings.json                    # Configuration (DB, email, etc.)
 └── Program.cs / Startup.cs             # ASP.NET Core setup and service registrations
-
-
-
-
-## ⚙️ Getting Started
-
-### 1. Clone the Repository
-
-git clone https://github.com/your-username/ReadHaven.git
-cd ReadHaven
-
-
-### 🚀 Live Demo
-
-🔗 [View Live Demo](http://172.16.227.82/)
