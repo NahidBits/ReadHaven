@@ -45,6 +45,7 @@
 
 ## 🧩 Project Structure
 
+```bash
 ReadHaven/
 ├── Controllers/
 --│   ├── AuthController.cs               # Handles registration, login, password reset
