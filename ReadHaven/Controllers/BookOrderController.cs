@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using ReadHaven.Models.Enums;
 using ReadHaven.Models.Order;
+using ReadHaven.Models;
 using ReadHaven.Services;
+using ReadHaven.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ReadHaven.Models.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReadHaven.Controllers
 {
@@ -25,8 +29,35 @@ namespace ReadHaven.Controllers
         [HttpGet("Index")]
         public IActionResult Index()
         {
-            PlaceOrder(UserId);
-            return View();
+           var hasCartItems = _context.CartItems.Any(c => c.UserId == UserId && !c.IsDeleted);
+           if (!hasCartItems)
+           {
+              return RedirectToAction("Index", "Book");
+           }
+           return View();
+        }
+
+        [HttpGet("UserProductDetails")]
+        public IActionResult UserProductDetails()
+        {
+            var cartItems = _cartService.GetOrderCartItemsForUser(UserId);
+
+            int totalQuantity = 0;
+            decimal totalAmount = 0;
+
+            foreach (var item in cartItems)
+            {
+                totalQuantity += item.Quantity;
+                totalAmount += item.Quantity * item.Price;
+            }
+
+            return Ok(new
+            {
+                totalQuantity,
+                totalAmount,
+                Discount = 10.00,
+                Tax = 5.00
+            });
         }
 
         [HttpGet("GetMyOrders")]
@@ -38,7 +69,10 @@ namespace ReadHaven.Controllers
                 .Select(o => new
                 {
                     o.Id,
-                    o.TotalAmount,
+                    TotalAmount = _context.PaymentTransactions
+                        .Where(p => p.OrderId == o.Id)
+                        .Select(p => p.TotalAmount)
+                        .FirstOrDefault(),
                     o.Status,
                     o.OrderDate
                 })
@@ -56,7 +90,10 @@ namespace ReadHaven.Controllers
                 .Select(o => new
                 {
                     o.Id,
-                    o.TotalAmount,
+                    TotalAmount = _context.PaymentTransactions
+                        .Where(p => p.OrderId == o.Id)
+                       .Select(p => p.TotalAmount)
+                       .FirstOrDefault(),
                     o.Status,
                     o.OrderDate
                 })
@@ -65,6 +102,7 @@ namespace ReadHaven.Controllers
             return Ok(orders);
         }
 
+
         [Authorize(Roles = "Admin")]
         [HttpGet("GetAllUserOrders")]
         public IActionResult GetAllUserOrders()
@@ -72,6 +110,16 @@ namespace ReadHaven.Controllers
             var orders = _context.Orders
                 .OrderBy(o => o.Status)
                 .ThenByDescending(o => o.OrderDate)
+                .Select(o => new
+                {
+                    o.Id,
+                    TotalAmount = _context.PaymentTransactions
+                        .Where(p => p.OrderId == o.Id)
+                        .Select(p => p.TotalAmount)
+                        .FirstOrDefault(),
+                    o.Status,
+                    o.OrderDate
+                })
                 .ToList();
 
             return Ok(orders);
@@ -94,45 +142,29 @@ namespace ReadHaven.Controllers
         }
 
         [HttpPost("ConfirmOrder")]
-        public IActionResult ConfirmOrder(Guid orderId)
+        public IActionResult 
+        ConfirmOrder([FromBody] OrderViewModel order)
         {
-            var order = _context.Orders
-                .FirstOrDefault(o => o.Id == orderId && o.UserId == UserId);
-
-            if (order == null)
-                return NotFound();
-
-            order.Status = OrderStatus.Processing;
-            _context.Orders.Update(order);
-            _context.SaveChanges();
-
-            return Ok();
-        }
-
-        private void PlaceOrder(Guid userId)
-        {
-            var cartItems = _context.CartItems.Where(c => c.UserId == userId).ToList();
-
-            if (!cartItems.Any())
-                return;
-
-            var order = new Order
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(order.Email) || !IsValidEmail(order.Email))
             {
-                UserId = userId,
-                TotalAmount = cartItems.Sum(c => c.Price * c.Quantity),
-                OrderDate = DateTime.UtcNow
-            };
-
-            _context.Orders.Add(order);
-
-            foreach (var item in cartItems)
-            {
-                item.OrderId = order.Id;
-                item.IsDeleted = true;
+                return Ok(new { success = false, message = "Invalid input. Please check the form and try again." });
             }
 
-            _context.CartItems.UpdateRange(cartItems);
+            var newOrder = new Order
+            {
+                UserId = UserId,
+                ShippingAddress = order.ShippingAddress,
+                Email = order.Email,
+                ShippingCity = order.ShippingCity,
+                ShippingPostalCode = order.ShippingPostalCode,
+                ShippingCountry = order.ShippingCountry,
+                ShippingContact = order.ShippingContact,
+                PossibleDayToShip = DateTime.UtcNow.AddDays(5), 
+            };
+
+            _context.Orders.Add(newOrder);
             _context.SaveChanges();
+            return Ok(new { success = true,orderId = newOrder.Id});
         }
     }
 }

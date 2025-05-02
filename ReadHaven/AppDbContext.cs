@@ -4,6 +4,8 @@ using ReadHaven.Models.Book;
 using ReadHaven.Models.Common;
 using ReadHaven.Models.Cart;
 using ReadHaven.Models.Order;
+using ReadHaven.Models.Payment;
+using ReadHaven.Models;
 
 
 
@@ -24,6 +26,8 @@ namespace ReadHaven
         public DbSet<Order> Orders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<OtpRequest> OtpRequests { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ReadHaven.Models.Book;
-using ReadHaven.Services;
-using System.Net;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using ReadHaven.Models.User;
 using ReadHaven.ViewModels;
+using ReadHaven.Services;
+using ReadHaven.Models.Book;
+using System.Linq;
 
 namespace ReadHaven.Controllers
 {
     [Authorize]
-    [Route("[controller]")] 
+    [Route("[controller]")]
     public class ProfileController : BaseController
     {
         private readonly AppDbContext _context;
+
         public ProfileController(AppDbContext context)
         {
             _context = context;
@@ -31,16 +30,46 @@ namespace ReadHaven.Controllers
         public IActionResult GetUserProfile()
         {
             var user = _context.Users
-                .Where(u => u.Id == UserId).FirstOrDefault();
+                .Where(u => u.Id == UserId)
+                .Select(u => new
+                {
+                    Name = u.Username,
+                    Email = u.Email
+                })
+                .FirstOrDefault();
 
-            var userProfile = new
+            if (user == null)
             {
-                Name = user.Username,
-                Email = user.Email
-            };
+                return NotFound();
+            }
 
-            return Ok(userProfile);
+            return Ok(user);
+        }
+
+        [HttpGet("LoadProfileSection")]
+        public IActionResult LoadProfileSection()
+        {
+            return PartialView("_ProfileSection");
+        }
+
+        [HttpGet("LoadMyOrderSection")]
+        public IActionResult LoadMyOrderSection()
+        {
+            return PartialView("_MyOrderSection");
+        }
+
+        [Authorize(Roles ="Admin")]
+        [HttpGet("LoadUserOrderSection")]
+        public IActionResult LoadUserOrderSection()
+        {
+            return PartialView("_UserOrderSection");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("LoadBookSalesSection")]
+        public IActionResult LoadBookSalesSection()
+        {
+            return PartialView("_BookSalesSection");
         }
     }
-
 }

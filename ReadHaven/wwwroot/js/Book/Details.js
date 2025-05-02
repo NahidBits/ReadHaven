@@ -2,6 +2,8 @@ let bookId = null;
 let reviews = [];
 let currentReviewIndex = 0;
 let currentUserReview = null;
+let isPurchased = false;
+const reviewForm = document.getElementById("reviewForm");
 const ratingLabels = {
     1: "Bad",
     2: "Satisfactory",
@@ -9,7 +11,19 @@ const ratingLabels = {
     4: "Very Good",
     5: "Excellent"
 };
-
+function isPurchasedBook() {
+    $.ajax({
+        url: `/BookCart/IsPurchasedBook`,
+        type: "GET",
+        data: { bookId: bookId },
+        success: function (data) {
+            isPurchased = data;
+        },
+        error: function () {
+            showToastMessage("Failed to load user role.", "error");
+        }
+    });
+}
 // Book Section
 function populateBookForm(book) {
     $("#Title").val(book.title);
@@ -109,7 +123,7 @@ function loadReviews(bookId) {
 
         if (userId) {
             currentUserReview = reviews.find(r => r.userId === userId);
-            populateReviewForm();
+          //  populateReviewForm();
         }
     });
 }
@@ -180,6 +194,7 @@ function submitReview(e) {
         showToastMessage("Review saved successfully!", "success");
         loadReviews(bookId);
         showRating(bookId);
+        populateReviewForm();
     }).fail(() => {
         showToastMessage("Failed to save review.", "error");
     });
@@ -197,6 +212,7 @@ function deleteReview() {
             showToastMessage("Review deleted.", "info");
             loadReviews(bookId);
             showRating(bookId);
+            populateReviewForm();
         },
         error: function () {
             showToastMessage("Failed to delete review.", "error");
@@ -204,12 +220,31 @@ function deleteReview() {
     });
 }
 
+function writeReview() {
+    const userReview = document.getElementById("writeReviewButton");
+
+    if (!userReview) return;
+
+    if (userRole === "Guest") {
+        userReview.innerHTML = '<span class="text-muted small">Login to review</span>';
+    } else if (isPurchased) {
+        userReview.innerHTML = '';
+        reviewForm.style.display = 'block';
+        userReview.style.display = 'none';
+        populateReviewForm(); 
+    } else {
+        userReview.innerHTML = '<span class="text-muted small">Purchase book to review</span>';
+    }
+}
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
     bookId = window.location.pathname.split("/").pop();
+    reviewForm.style.display = 'none'; 
 
     updateCartCountBadge();
     showBook(bookId);
     showRating(bookId);
     loadReviews(bookId);
+    isPurchasedBook();
 });

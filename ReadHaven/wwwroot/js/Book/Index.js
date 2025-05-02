@@ -8,25 +8,6 @@ let searchData = {
     EndIndex: 9
 };
 
-
-// Show success or error toast
-function showToastMessage(message, type = "success") {
-    const toastClass = type === "error" ? "bg-danger text-white" : "bg-success text-white";
-    const toast = document.createElement("div");
-    toast.className = `toast align-items-center ${toastClass} border-0 position-fixed bottom-0 end-0 m-3`;
-    toast.role = "alert";
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-    document.body.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    setTimeout(() => toast.remove(), 3000);
-}
-
 // Submit New Book Form
 function handleBookFormSubmit(event) {
     event.preventDefault();
@@ -196,47 +177,41 @@ function addToCart(bookId) {
     });
 }
 
-// Update the cart badge count
-function updateCartCountBadge() {
-    $.ajax({
-        url: "/BookCart/GetCartCount",
-        type: "GET",
-        success: function (count) {
-            const cartCountBadge = document.getElementById("cartCountBadge");
-            if (cartCountBadge) {
-                cartCountBadge.textContent = count;
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Failed to update cart count:", error);
-        }
-    });
-}
-
 // Pagination
-
 function renderPagination() {
     const container = document.getElementById("paginationContainer");
     container.innerHTML = "";
 
     const createPageButton = (pageNum, innerHtml, isActive = false, disabled = false) => {
-        if (isActive) return; // 👈 Skip rendering the current page button
-
         const btn = document.createElement("button");
         btn.innerHTML = innerHtml;
-        btn.disabled = disabled;
-        btn.className = `btn btn-sm mx-1 ${isActive ? "btn-primary" : "btn-outline-secondary"}`;
-        btn.onclick = () => {
-            if (pageNum !== currentPage && !disabled) {
-                currentPage = Math.min(pageNum, totalPages);
-                currentPage = Math.max(pageNum, 1);
-                sessionStorage.setItem("bookCurrentPage", currentPage);
-                searchData.StartIndex = Math.max((currentPage - 1) * 9 + 1, 0);
-                searchData.EndIndex = searchData.StartIndex + 9 - 1;
-                showBookList();
-                renderPagination();
-            }
-        };
+        btn.disabled = isActive || disabled;
+
+        btn.classList.add("btn", "btn-sm", "mx-1", "px-2", "py-1", "transition");
+
+        if (isActive) {
+            // Current page style (flat gray)
+            btn.classList.add("btn-secondary", "fw-bold", "text-white");
+            btn.style.cursor = "default";
+        } else {
+            // Other pages
+            btn.classList.add("btn-outline-secondary");
+            btn.onclick = () => {
+                if (!disabled && pageNum !== currentPage) {
+                    currentPage = Math.min(Math.max(pageNum, 1), totalPages);
+                    sessionStorage.setItem("bookCurrentPage", currentPage);
+
+                    // Update the URL without reloading the page
+                    history.pushState(null, "", `/page/${currentPage}`);
+
+                    searchData.StartIndex = (currentPage - 1) * 9 + 1;
+                    searchData.EndIndex = searchData.StartIndex + 8;
+                    showBookList();
+                    renderPagination();
+                }
+            };
+        }
+
         container.appendChild(btn);
     };
 
@@ -247,11 +222,12 @@ function renderPagination() {
     if (endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
 
     for (let i = startPage; i <= endPage; i++) {
-        createPageButton(i, `<span>${i}</span>`, i === currentPage);
+        createPageButton(i, i, i === currentPage);
     }
 
     createPageButton(currentPage + 1, '<i class="bi bi-chevron-right"></i>', false, currentPage === totalPages);
 }
+
 
 
 function loadTotalPages() {
@@ -275,10 +251,25 @@ function loadTotalPages() {
 window.onload = async function () {
     updateCartCountBadge();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageFromUrl = window.location.pathname.split("/").pop();
+
+    currentPage = 1;
+
+    if (pageFromUrl && !isNaN(pageFromUrl)) {
+        currentPage = parseInt(pageFromUrl);
+    }
+
     try {
         await loadTotalPages();
-        renderPagination();    
-        showBookList();         
+
+        if (currentPage < 1 || currentPage > totalPages) {
+            currentPage = 1;
+            history.pushState(null, "", "/page/1");
+        }
+
+        renderPagination();
+        showBookList();
     } catch (error) {
         showToastMessage("Failed to initialize page.", "error");
     }
@@ -290,3 +281,4 @@ window.onload = async function () {
         }
     }
 };
+

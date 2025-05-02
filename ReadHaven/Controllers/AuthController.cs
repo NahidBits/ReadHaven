@@ -85,6 +85,9 @@ namespace ReadHaven.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(!IsValidEmail(user.Email))
+                    return View();
+
                 var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
                 if (findUser != null || user.PasswordHash != confirmPassword) return View();
 
@@ -136,11 +139,16 @@ namespace ReadHaven.Controllers
         [HttpGet("ForgotPassword")]
         public IActionResult ForgotPassword() => View();
 
-        [HttpPost]
+        [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
+            if(!IsValidEmail(email))
+            {
+                return Ok(new { success = false, message = "Invalid Email." });
+            }
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return View();
+            if (user == null) return Ok(new { success = false, message = "user not found" });
 
             var token = Guid.NewGuid().ToString();
             var resetToken = new ResetPasswordToken
@@ -158,11 +166,14 @@ namespace ReadHaven.Controllers
 
             await _emailSender.SendEmailAsync(user.Email, "Password Reset Request", message);
 
-            return RedirectToAction("ForgotPasswordConfirmation");
+            return Ok(new { success = true, message = "Resetlink is sended" });
+            //RedirectToAction("ForgotPasswordConfirmation");
         }
 
+        [HttpGet("ForgotPasswordConfirmation")]
         public IActionResult ForgotPasswordConfirmation() => View();
 
+        [HttpGet("ResetPassword")]  
         public IActionResult ResetPassword(string token)
         {
             var resetToken = _context.ResetPasswordToken
@@ -174,7 +185,7 @@ namespace ReadHaven.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword(PasswordResetModel model)
         {
             if (model.NewPassword != model.ConfirmPassword)
@@ -201,9 +212,9 @@ namespace ReadHaven.Controllers
             return RedirectToAction("Index", "Auth");
         }
 
+        [HttpGet("TokenExpired")]
         public IActionResult TokenExpired() => View();
-
-        private void MergeGuestSessionToUser(Guid userId)
+        protected void MergeGuestSessionToUser(Guid userId)
         {
             var guestCart = _cartService.GetCartItemsForGuest();
             foreach (var item in guestCart)

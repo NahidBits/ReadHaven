@@ -2,32 +2,56 @@
     ViewData["Title"] = "Your Cart";
 }
 
-<h3 class="mb-4 text-muted">🛒 Your Cart</h3>
+<h4 class="mb-4 text-gradient fw-semibold">🛒 Your Cart</h4>
 
-<div id="cartEmptyMessage" class="alert alert-warning text-center" style="display:none;">
+<!-- Empty Cart Message -->
+<div id="cartEmptyMessage" class="alert alert-warning text-center rounded-3 shadow-sm" style="display:none;">
     <p class="m-0">🛍️ Your cart is currently empty!</p>
 </div>
 
-<table id="cartTable" class="table table-hover table-bordered align-middle shadow-sm rounded" style="display:none;">
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">📖 </th>
-            <th scope="col">💵 </th>
-            <th scope="col">🔢 </th>
-            <th scope="col">⚙️ </th>
-        </tr>
-    </thead>
-    <tbody id="cartItemsTableBody" class="table-group-divider">
-        <!-- Dynamic content will be injected here by JavaScript -->
-    </tbody>
-</table>
-
-<div id="totalContainer" class="d-flex justify-content-between">
-    <h3>Total: <span id="totalSum">0</span></h3>
+<!-- Cart Table Wrapper -->
+<div class="card border-0 shadow-lg rounded-4" id="cartTableWrapper">
+    <table id="cartTable" class="table table-hover align-middle text-center mb-0" style="display:none;">
+        <thead class="sticky-top bg-light border-bottom">
+            <tr class="text-secondary fw-semibold">
+                <th class="py-2 px-3 text-center" title="Image">
+                    <i class="bi bi-image fs-5 text-info"></i>
+                </th>
+                <th class="py-2 px-3 text-center" title="Book">
+                    <i class="bi bi-book fs-5 text-primary"></i>
+                </th>
+                <th class="py-2 px-3 text-center" title="Price">
+                    <i class="bi bi-currency-dollar fs-5 text-warning"></i>
+                </th>
+                <th class="py-2 px-3 text-center" title="Quantity">
+                    <i class="bi bi-sort-numeric-up-alt fs-5 text-success"></i>
+                </th>
+                <th class="py-2 px-3 text-center" title="Action">
+                    <i class="bi bi-gear fs-5 text-danger"></i>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="cartItemsTableBody" class="table-group-divider">
+            <!-- Dynamic content will be injected here by JavaScript -->
+        </tbody>
+    </table>
 </div>
 
-<a href="@Url.Action("Index", "BookOrder")" class="btn btn-success btn-group-sm">
-    ✅ Place Order
-</a>
+<!-- Total and Action Button Section -->
+<div id="totalContainer" class="d-flex justify-content-between align-items-center bg-gradient p-4 rounded-5 shadow-lg mt-4">
+    <!-- Total Section -->
+    <div class="text-end">
+        <h3 class="text-dark mb-0 display-6 fw-bold">
+            <span id="totalSum">0</span> 💸
+        </h3>
+    </div>
+
+    <!-- Button Section -->
+    <a href="@Url.Action("Index", "BookOrder")" class="btn btn-success btn-lg px-4 py-2 ms-4 rounded-3 shadow-md d-flex justify-content-center align-items-center">
+        <i class="bi bi-cart-check fs-6"></i>
+    </a>
+
+</div>
 
 <script src="~/js/BookCart/Index.js"></script>
+

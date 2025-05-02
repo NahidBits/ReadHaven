@@ -1,0 +1,136 @@
+﻿@model ReadHaven.Models.Payment.Report
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Order Summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            padding: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            width: 180px;
+            display: inline-block;
+        }
+
+        .img-thumbnail {
+            width: 100px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table td {
+            word-break: break-word;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        @@media print {
+            .card, table {
+                page-break-inside: avoid;
+            }
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Order Summary</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <div>
+                <span class="summary-label">Date:</span>
+                @Model.Order.OrderDate.ToString("dddd, dd MMMM, yyyy 'at' hh:mm tt")
+            </div>
+            <div><span class="summary-label">Email:</span> @Model.Order.Email</div>
+            <div><span class="summary-label">Shipping Address:</span> @Model.Order.ShippingAddress, @Model.Order.ShippingCity, @Model.Order.ShippingPostalCode, @Model.Order.ShippingCountry</div>
+            <div><span class="summary-label">Contact:</span> @Model.Order.ShippingContact</div>
+            <div><span class="summary-label">Status:</span> @Model.Order.Status</div>
+        </div>
+    </div>
+
+    <h2>Items</h2>
+    <div class="table-wrapper">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Image</th>
+                    <th>Book</th>
+                    <th style="width: 80px;">Qty</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item.Base64Image" alt="@item.BookTitle" class="img-thumbnail" />
+                        </td>
+                        <td>@item.BookTitle</td>
+                        <td>@item.Quantity</td>
+                        <td>$@item.UnitPrice.ToString("0.00")</td>
+                        <td>$@item.TotalPrice.ToString("0.00")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Payment</h2>
+    <div class="card">
+        <div class="card-body">
+            <div><span class="summary-label">Transaction ID:</span> @Model.Payment.TransactionId</div>
+            <div><span class="summary-label">Payment Method:</span> @Model.Payment.PaymentMethod</div>
+
+            @{
+                decimal taxPercent = Model.Payment.TaxAmount;
+                decimal discountPercent = Model.Payment.DiscountAmount;
+                decimal totalAmount = Model.Payment.TotalAmount;
+                decimal grandTotal = totalAmount + (totalAmount * (taxPercent / 100)) - (totalAmount * (discountPercent / 100));
+            }
+
+            <hr />
+            <div><span class="summary-label">Total:</span> $@totalAmount.ToString("0.00")</div>
+            <div><span class="summary-label">Tax (%):</span> @taxPercent%</div>
+            <div><span class="summary-label">Discount (%):</span> @discountPercent%</div>
+            <div><span class="summary-label">Grand Total:</span> <strong>$@grandTotal.ToString("0.00")</strong></div>
+        </div>
+    </div>
+
+</body>
+</html>

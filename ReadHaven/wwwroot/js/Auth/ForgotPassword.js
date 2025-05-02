@@ -1,28 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Forgot Password";
-}
+﻿function sendResetLink() {
+    const email = document.getElementById("emailInput").value;
 
-<div class="container mt-5">
-    <h2 class="text-center">Forgot Password</h2>
-    <p class="text-center">Enter your email address to receive a password reset link.</p>
-
-    <form asp-action="ForgotPassword" method="post" class="w-50 mx-auto">
-        @if (ViewBag.Message != null)
-        {
-            <div class="alert alert-info">
-                @ViewBag.Message
-            </div>
+    $.ajax({
+        url: "/Auth/ForgotPassword",
+        type: "POST",
+        data: { email: email },
+        success: function (response) {
+            if (response.success) {
+                showToastMessage(response.message);
+                window.location.href = "/Auth/ForgotPasswordConfirmation";   
+            } else {
+                showToastMessage(response.message, "error");
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error submitting email:", textStatus, errorThrown);
+            showToastMessage("Something went wrong!", "error");
         }
-
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" name="email" class="form-control" required placeholder="Enter your email" />
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block mt-3">Send Reset Link</button>
-    </form>
-
-    <div class="text-center mt-4">
-        <p>Remembered your password? <a href="@Url.Action("Index", "Auth")">Login here</a></p>
-    </div>
-</div>
+    });
+}

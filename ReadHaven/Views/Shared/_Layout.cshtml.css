@@ -38,10 +38,27 @@ button.accept-policy {
   line-height: inherit;
 }
 
+.nav-item.position-relative {
+    position: relative;
+}
+
+#cart-count-badge { 
+    font-size: 0.90rem;
+    color: black;
+    z-index: 10;
+}
+
+.nav-link {
+    display: inline-flex; /* Ensure the cart icon and badge stay aligned */
+    align-items: center;
+}
+
+
+
 /* Minimized footer with left logo, motto, and right contact information */
 .readhaven-footer {
     background: #212529;
-    font-size: 0.75rem; /* Smaller font */
+    font-size: 0.75rem; 
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
@@ -50,6 +67,7 @@ button.accept-policy {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-top: auto;
     }
 
     .readhaven-footer .logo-text {

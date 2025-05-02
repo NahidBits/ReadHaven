@@ -121,6 +121,26 @@
         font-weight: bold;
     }
 
+/*review button*/
+.review-button {
+    background-color: #6c757d !important; /* Force gray background */
+    color: white !important; /* White text */
+    border: none;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+    .review-button:hover {
+        background-color: #5a6268 !important; /* Darker gray on hover */
+    }
+
+    .review-button:active {
+        background-color: #4e555b !important; /* Even darker on click */
+    }
+
+
 /* Review Form Section */
 #reviewFormSection {
     max-width: 350px;
