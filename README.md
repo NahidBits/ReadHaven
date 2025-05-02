@@ -47,7 +47,7 @@
 
 ReadHaven/
 ├── Controllers/
-│   ├── AuthController.cs               # Handles registration, login, password reset
+--│   ├── AuthController.cs               # Handles registration, login, password reset
 │   ├── BookController.cs               # Admin & user access to book listing, creation, update
 │   ├── BookDetailsController.cs        # Handles book details, reviews (CRUD), and ratings
 │   ├── BookOrderController.cs          # Order placement, viewing orders, status changes
