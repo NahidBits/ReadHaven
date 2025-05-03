@@ -68,6 +68,7 @@ function loadCartData() {
             $('#cartTable').hide();
             $('#cartEmptyMessage').show();
             $('#totalSum').text('$0.00');
+            showToastMessage("Could not load cart data", "error");
         }
     });
 }
@@ -93,15 +94,19 @@ function changeQuantity(id, change, price) {
 
                 quantitySpan.text(newQuantity);
                 changeTotalSum(change * price);
+
+                showToastMessage("Quantity updated", "success");
             } else {
-                alert('Failed to update quantity.');
+                showToastMessage("Failed to update quantity", "error");
             }
         },
         error: function (xhr, status, error) {
             console.error('Error changing quantity:', error);
+            showToastMessage("Error updating quantity", "error");
         }
     });
 }
+
 
 // Function to remove an item from the cart
 function removeItem(id) {
@@ -114,20 +119,23 @@ function removeItem(id) {
                 const itemRow = $('#cart-item-' + id);
                 const price = parseFloat(itemRow.find('.item-price').text().replace('$', '').trim());
                 const quantity = parseInt(itemRow.find('#quantity-' + id).text());
-                $('#cart-item-' + id).remove();
 
-                changeTotalSum(- (quantity * price));
+                $('#cart-item-' + id).remove();
+                changeTotalSum(-(quantity * price));
 
                 if (response.cartItemCount === 0) {
                     $('#cartTable').hide();
                     $('#cartEmptyMessage').show();
                 }
+
+                showToastMessage("Item removed from cart", "info");
             } else {
-                alert('Failed to remove item.');
+                showToastMessage("Failed to remove item", "error");
             }
         },
         error: function (xhr, status, error) {
             console.error('Error removing item:', error);
+            showToastMessage("Error removing item", "error");
         }
     });
 }

@@ -226,14 +226,14 @@ function writeReview() {
     if (!userReview) return;
 
     if (userRole === "Guest") {
-        userReview.innerHTML = '<span class="text-muted small">Login to review</span>';
+        showToastMessage("Login to review", "info");
     } else if (isPurchased) {
         userReview.innerHTML = '';
         reviewForm.style.display = 'block';
         userReview.style.display = 'none';
         populateReviewForm(); 
     } else {
-        userReview.innerHTML = '<span class="text-muted small">Purchase book to review</span>';
+        showToastMessage("Purchase book to review", "warning");
     }
 }
 

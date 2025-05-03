@@ -9,8 +9,7 @@ namespace ReadHaven.Models.Order
         public Guid UserId { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
-        public string ShippingAddress { get; set; }    
-        public string Email { get; set; } = string.Empty;   
+        public string ShippingAddress { get; set; }     
         public City ShippingCity { get; set; }          
         public string ShippingPostalCode { get; set; }     
         public Country ShippingCountry { get; set; }        

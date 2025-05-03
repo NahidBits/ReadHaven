@@ -102,31 +102,33 @@ namespace ReadHaven.Controllers
 
             _context.PaymentTransactions.Add(newPayment);
             _context.SaveChanges();
-
-            // Generate PDF
-            var pdfBytes = await GenerateOrderSummary(payment.OrderId);
-
-            // Send email with PDF
-            var subject = "Order Confirmation with Summary";
-            var message = "Thank you for your order. Please find the attached order summary.";
-            var attachments = new List<(byte[] Content, string FileName, string MimeType)>
-    {
-        (pdfBytes, "OrderSummary.pdf", "application/pdf")
-    };
-
-            await _emailSender.SendEmailWithAttachmentAsync(payment.Email, subject, message, attachments);
-
-
             _context.CartItems.RemoveRange(cartItems);
             _context.OtpRequests.Remove(otpRequest);
             await _context.SaveChangesAsync();
             return Ok(true);
         }
 
+        [HttpPost("SendOrderSummary")]
+        public async Task<IActionResult> SendOrderSummary(Guid orderId)
+        {
+            var pdfBytes = await GenerateOrderSummary(orderId);
+
+            // Send email with PDF
+            var subject = "Order Confirmation with Summary";
+            var message = "Thank you for your order. Please find the attached order summary.";
+            var attachments = new List<(byte[] Content, string FileName, string MimeType)>
+            {
+             (pdfBytes, "OrderSummary.pdf", "application/pdf")
+            };
+
+            await _emailSender.SendEmailWithAttachmentAsync(UserEmail, subject, message, attachments);
+            return Ok();
+        }
+
         public async Task<byte[]> GenerateOrderSummary(Guid orderId)
         {
             var order = _context.Orders.FirstOrDefault(o => o.Id == orderId);
-            var cartItems = _context.CartItems.Where(c => c.OrderId == orderId).ToList();
+            var cartItems = _context.CartItems.IgnoreQueryFilters().Where(c => c.OrderId == orderId && c.IsDeleted).ToList();
             var paymentTransaction = _context.PaymentTransactions.FirstOrDefault(p => p.OrderId == orderId);
 
             var bookIds = cartItems.Select(c => c.BookId).Distinct().ToList();

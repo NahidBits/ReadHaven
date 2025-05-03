@@ -1,93 +1,170 @@
-﻿/* General Container */
-.container {
-    max-width: 900px;
-    margin: auto;
+﻿.container {
     padding: 20px;
 }
 
-/* Section Cards */
-.order-summary, .shipping-payment-form {
-    margin-bottom: 30px;
-    border-radius: 12px;
-    overflow: hidden;
+@media (min-width: 992px) {
+    .container {
+        max-width: 1140px;
+    }
 }
 
-    /* Card Headers */
+.order-summary,
+.shipping-payment-form {
+    margin-bottom: 30px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
     .order-summary .card-header,
     .shipping-payment-form .card-header {
         font-size: 1.3rem;
         font-weight: 600;
         padding: 1rem 1.25rem;
+        background-color: #f1f3f5;
+        border-bottom: 1px solid #dee2e6;
+        letter-spacing: 0.5px;
     }
 
-/* Summary Items */
-.order-summary-item p,
-.order-summary-footer p {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+.order-summary {
+    position: sticky;
+    top: 80px;
 }
 
-/* Pricing Breakdown */
-.order-summary-footer {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-}
+    .order-summary .list-group-item {
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-bottom: 1px solid #eaeaea;
+    }
 
-/* Highlight Totals */
 #totalAmountAllCutting {
     color: #0d6efd;
+    font-weight: 600;
 }
 
 #taxAmount {
     color: #198754;
+    font-weight: 500;
 }
 
 #discountAmount {
     color: #dc3545;
+    font-weight: 500;
 }
 
-/* Form Groups */
+.order-summary-footer {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    border: 1px solid #dee2e6;
+}
+
 .shipping-payment-form .form-label {
     font-weight: 500;
+    color: #212529;
 }
 
 .shipping-payment-form input,
 .shipping-payment-form select {
+    width: 100%;
     padding: 10px;
     font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    background-color: #fff;
 }
 
-/* Buttons */
-.btn-primary {
+    .shipping-payment-form input:focus,
+    .shipping-payment-form select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        outline: none;
+    }
+
+    .shipping-payment-form input:focus-visible,
+    .shipping-payment-form select:focus-visible {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+    }
+
+.btn-primary,
+.btn-success {
     width: 100%;
     font-size: 1.1rem;
     padding: 12px;
     border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.btn-link {
-    padding: 0;
+    .btn-primary:hover,
+    .btn-success:hover {
+        transform: translateY(-2px);
+    }
+
+.btn-outline-secondary {
     font-size: 0.95rem;
-    color: #0d6efd;
-    text-decoration: underline;
+    padding: 8px 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Hidden Sections */
-#paymentInfoForm,
-#emailForm,
-#otpForm {
-    margin-top: 20px;
+    .btn-outline-secondary:hover {
+        background-color: #e2e6ea;
+        color: #212529;
+    }
+
+button:disabled,
+.btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
-/* Responsive Adjustments */
+/* Visibility transitions */
+.hidden {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+.visible {
+    display: block !important;
+    opacity: 1 !important;
+    transition: opacity 0.3s ease;
+}
+
+/* Optional Smooth Transition (for animated height expand/collapse) */
+.form-transition {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+    .form-transition.active {
+        max-height: 2000px;
+        opacity: 1;
+    }
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 123, 255, 0.15);
+    transition: box-shadow 0.2s ease-in-out;
+}
+/* Mobile enhancements */
 @media (max-width: 576px) {
-    .order-summary .card-header,
-    .shipping-payment-form .card-header {
-        font-size: 1.1rem;
+    .btn-primary, .btn-success {
+        font-size: 1rem;
+        padding: 10px;
     }
 
-    .btn-primary {
-        font-size: 1rem;
+    .order-summary,
+    .shipping-payment-form {
+        margin-bottom: 20px;
+        box-shadow: none;
     }
+
+        .order-summary .card-header,
+        .shipping-payment-form .card-header {
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
+        }
 }

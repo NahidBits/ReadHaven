@@ -37,41 +37,50 @@ function formatDate(dateString) {
     return `${dayName}, ${day}${getOrdinalSuffix(day)} ${month} ${year}`;
 }
 
+// ✅ Global Toast Container (only once)
+(function createToastContainer() {
+    if (!document.getElementById("toast-container")) {
+        const container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "toast-container position-fixed bottom-0 end-0 p-3";
+        container.style.zIndex = "1080";
+        document.body.appendChild(container);
+    }
+})();
+
+
 // ✅ Global Toast Notification
 function showToastMessage(message, type = "success") {
     const config = {
-        success: { bg: "bg-success", icon: "bi-check-circle-fill", text: "text-white" },
-        error: { bg: "bg-danger", icon: "bi-exclamation-triangle-fill", text: "text-white" },
-        warning: { bg: "bg-warning", icon: "bi-exclamation-circle-fill", text: "text-dark" },
-        info: { bg: "bg-info", icon: "bi-info-circle-fill", text: "text-dark" }
+        success: { bg: "bg-success bg-opacity-75", icon: "bi-check-circle", text: "text-white" },
+        error: { bg: "bg-danger bg-opacity-75", icon: "bi-exclamation-triangle", text: "text-white" },
+        warning: { bg: "bg-warning bg-opacity-75", icon: "bi-exclamation-circle", text: "text-dark" },
+        info: { bg: "bg-info bg-opacity-75", icon: "bi-info-circle", text: "text-dark" }
     };
 
     const toastType = config[type] || config.success;
 
     const toast = document.createElement("div");
-    toast.className = `toast align-items-center ${toastType.bg} ${toastType.text} border-0 position-fixed bottom-0 end-0 m-3 shadow`;
+    toast.className = `toast ${toastType.bg} ${toastType.text} border-0 rounded px-3 py-2 mb-2 shadow-sm small`;
     toast.role = "alert";
     toast.setAttribute("aria-live", "assertive");
     toast.setAttribute("aria-atomic", "true");
 
     toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body d-flex align-items-center gap-2">
-                <i class="bi ${toastType.icon} fs-5"></i>
-                <span>${message}</span>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi ${toastType.icon}"></i>
+            <div class="flex-grow-1">${message}</div>
         </div>
     `;
 
-    document.body.appendChild(toast);
+    document.getElementById("toast-container").appendChild(toast);
 
-    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    const bsToast = new bootstrap.Toast(toast, { delay: 1500 });
     bsToast.show();
 
-    // Clean up after showing
-    setTimeout(() => toast.remove(), 3500);
+    setTimeout(() => toast.remove(), 1800);
 }
+
 
 // ✅ Save scroll position before navigating away
 window.addEventListener('beforeunload', function () {

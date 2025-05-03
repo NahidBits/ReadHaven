@@ -13,7 +13,7 @@ namespace ReadHaven.Models
         public PaymentMethod PaymentMethod { get; set; } 
         public string TransactionId { get; set; } = $"TXN-{DateTime.UtcNow:yyyyMMddHHmmss}-{new Random().Next(1000, 9999)}";
         public Status Status { get; set; }
-        public decimal DiscountAmount { get; set; } = 5;
-        public decimal TaxAmount { get; set; } = 10;
+        public decimal DiscountAmount { get; set; } = 10;
+        public decimal TaxAmount { get; set; } = 5;
     }
 }

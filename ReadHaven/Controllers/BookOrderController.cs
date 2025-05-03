@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReadHaven.Models.User;
 using Microsoft.EntityFrameworkCore;
+using MailKit.Search;
 
 namespace ReadHaven.Controllers
 {
@@ -142,29 +143,83 @@ namespace ReadHaven.Controllers
         }
 
         [HttpPost("ConfirmOrder")]
-        public IActionResult 
-        ConfirmOrder([FromBody] OrderViewModel order)
+        public IActionResult ConfirmOrder([FromBody] OrderViewModel order)
         {
-            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(order.Email) || !IsValidEmail(order.Email))
+            if (!ModelState.IsValid)
             {
                 return Ok(new { success = false, message = "Invalid input. Please check the form and try again." });
+            }
+
+            var existingOrder = _context.Orders.FirstOrDefault(o => o.Id == order.Id && o.UserId == UserId);
+
+            if (existingOrder != null)
+            {
+                existingOrder.ShippingAddress = order.ShippingAddress;
+                existingOrder.ShippingCity = order.ShippingCity;
+                existingOrder.ShippingPostalCode = order.ShippingPostalCode;
+                existingOrder.ShippingCountry = order.ShippingCountry;
+                existingOrder.ShippingContact = order.ShippingContact;
+
+                _context.Orders.Update(existingOrder);
+                _context.SaveChanges();
+
+                return Ok(new { success = true, orderId = existingOrder.Id, message = "Shipping info updated." });
             }
 
             var newOrder = new Order
             {
                 UserId = UserId,
                 ShippingAddress = order.ShippingAddress,
-                Email = order.Email,
                 ShippingCity = order.ShippingCity,
                 ShippingPostalCode = order.ShippingPostalCode,
                 ShippingCountry = order.ShippingCountry,
                 ShippingContact = order.ShippingContact,
-                PossibleDayToShip = DateTime.UtcNow.AddDays(5), 
+                PossibleDayToShip = DateTime.UtcNow.AddDays(5),
             };
 
             _context.Orders.Add(newOrder);
             _context.SaveChanges();
-            return Ok(new { success = true,orderId = newOrder.Id});
+
+            return Ok(new { success = true, orderId = newOrder.Id, message = "New order created." });
+        }
+
+        [HttpPost("OrderWithPreviousAddress")]
+        public IActionResult ConfirmOrderWithPreviousAddress(Guid orderId)
+        {
+            var existingOrder = _context.Orders.FirstOrDefault(o => o.Id == orderId && o.UserId == UserId);
+
+            if (existingOrder != null)
+            {
+                _context.Orders.Update(existingOrder);
+                _context.SaveChanges();
+                return Ok(new { success = true, orderId = existingOrder.Id, message = "Shipping info updated." });
+            }
+
+            existingOrder = _context.Orders
+                   .Where(o => o.UserId == UserId)
+                   .OrderByDescending(o => o.UpdatedAt)
+                   .FirstOrDefault();
+
+            if (existingOrder == null)
+            {
+                return Ok(new { success = false, message = "No previous Shipping Address found." });
+            }
+
+            var newOrder = new Order
+            {
+                UserId = UserId,
+                ShippingAddress = existingOrder.ShippingAddress,
+                ShippingCity = existingOrder.ShippingCity,
+                ShippingPostalCode = existingOrder.ShippingPostalCode,
+                ShippingCountry = existingOrder.ShippingCountry,
+                ShippingContact = existingOrder.ShippingContact,
+                PossibleDayToShip = DateTime.UtcNow.AddDays(5),
+            };
+
+            _context.Orders.Add(newOrder);
+            _context.SaveChanges();
+
+            return Ok(new { success = true, orderId = newOrder.Id, message = "New order created." });
         }
     }
 }

@@ -8,7 +8,7 @@ namespace ReadHaven.Models.Common
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;   
     }
 }

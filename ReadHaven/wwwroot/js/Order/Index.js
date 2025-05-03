@@ -11,7 +11,8 @@ const shippingCity = document.getElementById("shippingCity");
 const shippingPostalCode = document.getElementById("shippingPostalCode");
 const shippingContact = document.getElementById("contactNumber");
 const shippingCountry = document.getElementById("shippingCountry");
-const email = document.getElementById("email");
+const previousAddress = document.getElementById("usePreviousAddress");
+
 function loadProductDetails() {
     $.ajax({
         url: '/BookOrder/UserProductDetails',
@@ -34,15 +35,18 @@ function loadProductDetails() {
 
 function submitShippingAddress() {
     
-
+    const orderId = localStorage.getItem("orderId");
     var order = {
         ShippingAddress: shippingAddress.value,
         ShippingCity: parseInt(shippingCity.value),
         ShippingContact: shippingContact.value,
-        Email: email.value,
         ShippingPostalCode: shippingPostalCode.value,
         ShippingCountry: parseInt(shippingCountry.value)
     };
+
+    if (orderId) {
+        order.Id = orderId;
+    }
 
     $.ajax({
         url: '/BookOrder/ConfirmOrder',
@@ -51,9 +55,38 @@ function submitShippingAddress() {
         data: JSON.stringify(order), 
         success: function (response) {
             if (response.success) {
+                usePreviousAddress.style.display = 'none';
                 personalInfoForm.style.display = 'none';
                 paymentInfoForm.style.display = 'block';
-                document.getElementById("orderId").value = response.orderId;
+                localStorage.setItem("orderId", response.orderId);
+                showToastMessage('Shipping address Submitted.', 'success', 3000);
+
+            } else {
+                showToastMessage(response.message, 'danger', 3000);
+            }
+        },
+        error: function (error) {
+            console.error('Error Form Submit:', error);
+            showToastMessage('Error during form submission. Please try again later.', 'danger', 3000);
+        }
+    });
+}
+
+function sendWithPreviousAddress()
+{
+    const orderId = localStorage.getItem("orderId");
+
+    $.ajax({
+        url: '/BookOrder/OrderWithPreviousAddress',
+        type: 'POST',
+        contentType: 'application/json',
+        data: { orderId : orderId },
+        success: function (response) {
+            if (response.success) {
+                usePreviousAddress.style.display = 'none';
+                personalInfoForm.style.display = 'none';
+                paymentInfoForm.style.display = 'block';
+                localStorage.setItem("orderId", response.orderId);
                 showToastMessage('Shipping address Submitted.', 'success', 3000);
 
             } else {
@@ -107,7 +140,7 @@ function sendOtpToEmail() {
 function submitPayment() {
     var otp = otpInput.value;
     var email = emailInput.value;
-    var orderId = document.getElementById("orderId").value;  
+    var orderId = localStorage.getItem("orderId") || 0; 
     var currency = parseInt(document.getElementById("currency").value);
     var paymentMethod = parseInt(document.getElementById("paymentMethod").value);
     var amount = parseFloat(document.getElementById("totalAmountAllCutting").textContent);
@@ -134,10 +167,35 @@ function submitPayment() {
         data: JSON.stringify(payment),
         success: function (response) {
             if (response) {
+                localStorage.removeItem("orderId");
                 showToastMessage('OTP verified successfully and Payment is Successed!', 'success', 20000);
-                setTimeout(function () {
-                    window.location.assign("/Book");
-                }, 3000);
+                const leftContent = document.getElementById("leftContent");
+                if (leftContent) {
+                    leftContent.innerHTML = `
+                        <div class="card border-0 shadow mb-4 text-center p-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h3 class="fw-bold text-success">Thank You for Your Purchase!</h3>
+                            <p class="mt-3">Your order has been confirmed and will be processed shortly.</p>
+                            <p class="text-muted">A receipt has been sent to <strong>${email}</strong>.</p>
+                            <a href="/Book" class="btn btn-outline-primary mt-4">
+                                Browse More Books <i class="fas fa-book ms-2"></i>
+                            </a>
+                        </div>
+                    `;
+                }
+
+                // Optional: disable or blur the summary panel
+                const summaryPanel = document.querySelector(".col-lg-4 .card");
+                if (summaryPanel) {
+                    summaryPanel.classList.add("opacity-50");
+                    summaryPanel.style.pointerEvents = "none";
+                }
+
+                $.ajax({
+                    url: '/Payment/SendOrderSummary',
+                    type: 'POST',
+                    data: { orderId: orderId}
+                });
             } else {
                 showToastMessage(response.message || 'OTP verification failed.', 'danger', 3000);
             }

@@ -165,7 +165,7 @@ namespace ReadHaven.Services
         public void RemoveCartItemForGuest(Guid id)
         {
             var cartItems = GetCartItemsForGuest();
-            var itemToRemove = cartItems.FirstOrDefault(c => c.BookId == id);
+            var itemToRemove = cartItems.FirstOrDefault(c => c.Id == id);
 
             if (itemToRemove != null)
             {
