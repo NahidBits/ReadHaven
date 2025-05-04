@@ -231,4 +231,5 @@ sidebarToggle.addEventListener('click', () => {
 window.onload = function () {
     updateCartCountBadge();
     loadMyOrderSection();
+    localStorage.setItem("returnUrl", window.location.href);
 };

@@ -12,9 +12,7 @@
                     <i class="bi bi-person-plus-fill text-secondary me-2"></i> Sign Up
                 </h3>
 
-                <form asp-action="SignUp" method="post">
-                    <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
-
+                <form id="signUpForm" method="post">
                     <!-- Username -->
                     <div class="form-group mb-4">
                         <label asp-for="Username" class="visually-hidden">Username</label>
@@ -22,7 +20,7 @@
                             <span class="input-group-text bg-secondary text-white">
                                 <i class="bi bi-person-fill"></i>
                             </span>
-                            <input asp-for="Username" name="Username" class="form-control border-0 shadow-sm" placeholder="Username" />
+                            <input asp-for="Username" id="Username" name="Username" class="form-control border-0 shadow-sm" placeholder="Username" />
                         </div>
                         <span asp-validation-for="Username" class="text-danger small"></span>
                     </div>
@@ -34,7 +32,7 @@
                             <span class="input-group-text bg-secondary text-white">
                                 <i class="bi bi-envelope-fill"></i>
                             </span>
-                            <input asp-for="Email" name="Email" class="form-control border-0 shadow-sm" placeholder="Email" />
+                            <input asp-for="Email" id="Email" name="Email" class="form-control border-0 shadow-sm" placeholder="Email" />
                         </div>
                         <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
@@ -46,7 +44,7 @@
                             <span class="input-group-text bg-secondary text-white">
                                 <i class="bi bi-lock-fill"></i>
                             </span>
-                            <input asp-for="PasswordHash" name="PasswordHash" type="password" class="form-control border-0 shadow-sm" placeholder="Password" />
+                            <input asp-for="PasswordHash" id="PasswordHash" name="PasswordHash" type="password" class="form-control border-0 shadow-sm" placeholder="Password" />
                         </div>
                         <span asp-validation-for="PasswordHash" class="text-danger small"></span>
                     </div>
@@ -58,20 +56,25 @@
                             <span class="input-group-text bg-secondary text-white">
                                 <i class="bi bi-lock-fill"></i>
                             </span>
-                            <input name="ConfirmPassword" type="password" class="form-control border-0 shadow-sm" placeholder="Confirm Password" />
+                            <input id="ConfirmPassword" name="ConfirmPassword" type="password" class="form-control border-0 shadow-sm" placeholder="Confirm Password" />
                         </div>
                         <span class="text-danger small" id="confirmPasswordError"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-dark w-100 shadow-sm">
+                    <button type="submit" class="btn btn-dark w-100 shadow-sm mb-2">
                         <i class="bi bi-person-check-fill"></i> Sign Up
                     </button>
+                    <a href="/Auth/Login" class="btn btn-outline-dark w-100 shadow-sm">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+
+<script src="~/js/Auth/SignUp.js"></script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

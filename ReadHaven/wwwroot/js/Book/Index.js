@@ -280,5 +280,6 @@ window.onload = async function () {
             form.addEventListener("submit", handleBookFormSubmit);
         }
     }
+    localStorage.setItem("returnUrl", "/Book/Index");
 };
 

@@ -39,6 +39,18 @@ namespace ReadHaven.Controllers
                 return false;
             }
         }
-        
+        protected bool IsValidPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            var hasUpperCase = password.Any(char.IsUpper);
+            var hasLowerCase = password.Any(char.IsLower);
+            var hasDigit = password.Any(char.IsDigit);
+            var hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
+            var isLongEnough = password.Length >= 8;
+
+            return hasUpperCase && hasLowerCase && hasDigit && hasSpecial && isLongEnough;
+        }
     }
 }

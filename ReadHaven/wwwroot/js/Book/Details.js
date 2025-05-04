@@ -37,8 +37,93 @@ function populateBookDetails(book) {
     $("#ReadTitle").text(book.title || "N/A");
     $("#ReadGenre").text(book.genre || "N/A");
     $("#ReadPrice").text(book.price ? `$${book.price.toFixed(2)}` : "N/A");
+
+    const container = document.querySelector("#bookActionButtons");
+    if (!container) return;
+
+    const isLoved = book.isLoved === true;
+    const wishlistIconClass = isLoved ? "bi-heart-fill" : "bi-heart";
+    const wishlistBtnClass = isLoved ? "isLoved" : "";
+    const wishlistTitle = isLoved ? "Remove from Wishlist" : "Add to Wishlist";
+
+    const deleteBtn = (userRole === "Admin") ? `
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteBook('${book.id}')" title="Delete Book">
+            <i class="bi bi-trash"></i>
+        </button>` : "";
+
+    const cartBtn = `
+        <button class="btn btn-outline-primary btn-sm" onclick="addToCart('${book.id}')" title="Add to Cart">
+            <i class="bi bi-cart-plus"></i>
+        </button>`;
+
+    const wishlistBtn = isAuthenticated ? `
+        <button class="btn btn-outline-danger btn-sm wishlist-btn ${wishlistBtnClass}" 
+                onclick="toggleWishlist('${book.id}', this)" 
+                title="${wishlistTitle}" id="wishlistBtn">
+            <i class="bi ${wishlistIconClass}" id="wishlistIcon"></i>
+        </button>` : "";
+
+    container.innerHTML = `
+        <div class="d-flex justify-content-start gap-2 book-actions">
+            ${deleteBtn}
+            ${cartBtn}
+            ${wishlistBtn}
+        </div>`;
 }
 
+// Delete a book
+function deleteBook(bookId) {
+    if (confirm('Are you sure you want to delete this book?')) {
+        $.ajax({
+            url: '/Delete/' + bookId,
+            type: 'POST',
+            success: function () {
+                showToastMessage("Book deleted successfully!");
+                window.location.href = "/Book/Index";
+            },
+            error: function (xhr, status, error) {
+                showToastMessage("Error deleting book: " + error, "error");
+            }
+        });
+    }
+}
+
+// Add book to cart
+function addToCart(bookId) {
+    $.ajax({
+        url: "/BookCart/AddToCart",
+        type: "POST",
+        data: { bookId },
+        success: function () {
+            showToastMessage("Book added to cart!");
+            updateCartCountBadge();
+        },
+        error: function (xhr, status, error) {
+            console.error("Failed to add to cart:", error);
+            showToastMessage("Failed to add book to cart.", "error");
+        }
+    });
+}
+
+function toggleWishlist(bookId, btn) {
+    $.ajax({
+        url: `/Wishlist`,
+        type: "POST",
+        data: { bookId: bookId },
+        success: function () {
+            const icon = btn.querySelector("i");
+            btn.classList.toggle("isLoved");
+
+            const isWishlisted = btn.classList.contains("isLoved");
+            icon.className = `bi ${isWishlisted ? "bi-heart-fill" : "bi-heart"}`;
+            btn.setAttribute("title", isWishlisted ? "Remove from Wishlist" : "Add to Wishlist");
+        },
+        error: function (xhr) {
+            console.error("Error updating wishlist:", xhr.responseText);
+            showToastMessage("Could not update wishlist", "error");
+        }
+    });
+}
 function showBook(bookId) {
     $.get("/GetBookById", { id: bookId }, function (data) {
         if (data) {
@@ -247,4 +332,5 @@ document.addEventListener("DOMContentLoaded", () => {
     showRating(bookId);
     loadReviews(bookId);
     isPurchasedBook();
+    localStorage.setItem("returnUrl", window.location.href);
 });

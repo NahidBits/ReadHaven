@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -28,15 +29,21 @@ namespace ReadHaven.Controllers
         }
 
         [HttpGet("Login")]
-        public IActionResult Index(string returnUrl = null)
+        public IActionResult Index()
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Index(User user, string returnUrl = null)
+        public async Task<IActionResult> Index(User user)
         {
+            if (!ModelState.IsValid)
+                return Ok(new { success = false, message = "All fields are required. Please complete the form." });
+            else if(!IsValidEmail(user.Email))
+            {
+                return Ok(new { success = false, message = "The email address format is invalid." });
+            }
+
             var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
             if (findUser != null)
@@ -62,33 +69,36 @@ namespace ReadHaven.Controllers
 
                     MergeGuestSessionToUser(findUser.Id);
 
-                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                        return Redirect(returnUrl);
-
-                    return RedirectToAction("Index", "Book");
+                    return Ok(new { success = true });
                 }
             }
 
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+
+            return Ok(new { success = false, message = "Invalid email or password." });
         }
 
         [HttpGet("SignUp")]
-        public IActionResult SignUp(string returnUrl = null)
+        public IActionResult SignUp()
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost("SignUp")]
-        public async Task<IActionResult> SignUp(User user, string confirmPassword, string returnUrl = null)
+        public async Task<IActionResult> SignUp(User user, string confirmPassword)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid || user.Username==null)
+                return Ok(new { success = false, message = "All fields are required.Please complete the form."});
+            else if (!IsValidEmail(user.Email))
             {
-                if(!IsValidEmail(user.Email))
-                    return View();
+                return Ok(new { success = false, message = "The email address format is invalid." });
+            }
+            else if (!IsValidPassword(user.PasswordHash))
+                return Ok(new { success = false, message = "Password must be at least 8 characters long and contain a mix of uppercase, lowercase, number, and special character." });
+            else if (user.PasswordHash != confirmPassword)
+                return Ok(new { success = false, message = "Password and Confirm Password do not match." });
 
-                var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+            var findUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
                 if (findUser != null || user.PasswordHash != confirmPassword) return View();
 
                 var passwordHasher = new PasswordHasher<User>();
@@ -113,14 +123,7 @@ namespace ReadHaven.Controllers
 
                 MergeGuestSessionToUser(user.Id);
 
-                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                    return Redirect(returnUrl);
-
-                return RedirectToAction("Index", "Book");
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            return Ok(new { success = true});
         }
 
         [HttpGet("GetUserRoleStatus")]
@@ -167,7 +170,6 @@ namespace ReadHaven.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Password Reset Request", message);
 
             return Ok(new { success = true, message = "Resetlink is sended" });
-            //RedirectToAction("ForgotPasswordConfirmation");
         }
 
         [HttpGet("ForgotPasswordConfirmation")]
@@ -186,16 +188,20 @@ namespace ReadHaven.Controllers
         }
 
         [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword(PasswordResetModel model)
+        public async Task<IActionResult> ResetPassword(PasswordResetModel resetPassword)
         {
-            if (model.NewPassword != model.ConfirmPassword)
+            if(!ModelState.IsValid)
+                return Ok(new { success = false, message = "Please correct the highlighted errors in the form." });
+            else if (resetPassword.ConfirmPassword != resetPassword.NewPassword)
             {
-                ModelState.AddModelError("", "Passwords do not match.");
-                return View(model);
+                return Ok(new { success = false, message = "Password doesnt match." });
+            }else if(!IsValidPassword(resetPassword.NewPassword))
+            {
+                return Ok(new { success = false, message = "Password must be at least 8 characters long and contain a mix of uppercase, lowercase, number, and special character." });
             }
 
             var resetToken = _context.ResetPasswordToken
-                .FirstOrDefault(t => t.Token == model.Token && t.ExpirationDate > DateTime.UtcNow);
+                .FirstOrDefault(t => t.Token == resetPassword.Token && t.ExpirationDate > DateTime.UtcNow);
 
             if (resetToken == null) return RedirectToAction("TokenExpired");
 
@@ -203,13 +209,13 @@ namespace ReadHaven.Controllers
             if (user == null) return RedirectToAction("TokenExpired");
 
             var passwordHasher = new PasswordHasher<User>();
-            user.PasswordHash = passwordHasher.HashPassword(user, model.NewPassword);
+            user.PasswordHash = passwordHasher.HashPassword(user, resetPassword.NewPassword);
 
             _context.ResetPasswordToken.Remove(resetToken);
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Auth");
+            return Ok(new { success = true });
         }
 
         [HttpGet("TokenExpired")]

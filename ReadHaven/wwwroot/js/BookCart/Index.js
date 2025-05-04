@@ -151,4 +151,5 @@ function changeTotalSum(change) {
 // On page load, fetch and display the cart data
 window.onload = function () {
     loadCartData();
+    localStorage.setItem("returnUrl", window.location.href);
 };

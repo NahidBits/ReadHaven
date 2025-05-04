@@ -123,8 +123,24 @@ namespace ReadHaven.Controllers
         [HttpGet("GetBookById")]
         public async Task<IActionResult> GetBook(Guid id)
         {
-            var book = await _bookRepository.GetByIdAsync(id);
-            if (book == null) return NotFound();
+            var bookFind = await _bookRepository.GetByIdAsync(id);
+            if (bookFind == null) return NotFound();
+
+            var isLoved = false;
+            if (UserId != Guid.Empty)
+            {
+                isLoved = _context.Wishlists.Any(w => w.UserId == UserId && w.BookId == id && w.IsLoved);
+            }
+
+            var book = new
+            {
+                Id = bookFind.Id,
+                Title = bookFind.Title,
+                Genre = bookFind.Genre,
+                Price = bookFind.Price,
+                ImagePath = bookFind.ImagePath,
+                IsLoved = isLoved
+            };
 
             return Ok(book);
         }
@@ -169,7 +185,7 @@ namespace ReadHaven.Controllers
                 .Select(g => new
                 {
                     BookId = g.Key.Id,
-                    ImageUrl = g.Key.ImagePath,
+                    ImageUrl = string.IsNullOrEmpty(g.Key.ImagePath)? "/uploads/book/Default_image.webp": g.Key.ImagePath,
                     Title = g.Key.Title,
                     QuantitySold = g.Sum(x => x.cartItem.Quantity)  
                 })
