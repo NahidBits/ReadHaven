@@ -58,12 +58,14 @@ git clone https://github.com/NahidBits/ReadHaven.git
 ```bash
 ReadHaven/
 ├── Controllers/
---│   ├── AuthController.cs               # Handles registration, login, password reset
-│   ├── BookController.cs               # Admin & user access to book listing, creation, update
-│   ├── BookDetailsController.cs        # Handles book details, reviews (CRUD), and ratings
+│   ├── AuthController.cs               # Handles registration, login, password reset
+│   ├── BookController.cs               # Admin & user access to book listing, creation, update , Details
+│   ├── BookReviewController.cs         # Handles reviews & ratings (CRUD)
 │   ├── BookOrderController.cs          # Order placement, viewing orders, status changes
+├   ├── PaymentController.cs            # Handles OTP-based payments and payment confirmation
+│   ├── ProfileController.cs            # Manages user profile view, update, and user-specific data (e.g., past orders)
+│   ├── ErrorController.cs              # Handles application-level error views (404, 500, etc.)
 │   └── BaseController.cs               # Shared user/role access logic
-│
 ├── Models/
 │   ├── Book.cs                         # Book data model
 │   ├── Review.cs                       # Review model linked to Book & User
